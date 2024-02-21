@@ -140,16 +140,16 @@ public class CandidateServiceTest {
 
         var actualCandidate = candidateService.getCandidateById(CANDIDATE_ID);
 
-        assertEquals(expectedCandidate, actualCandidate.orElse(null));
+        assertEquals(expectedCandidate, actualCandidate);
     }
 
     @Test
     void givenNonExistentCandidateId_whenGetCandidateById_thenEmptyOptionalReturned() {
         when(mockCandidateRepository.findById(CANDIDATE_ID)).thenReturn(Optional.empty());
 
-        Optional<Candidate> result = candidateService.getCandidateById(CANDIDATE_ID);
+        Candidate result = candidateService.getCandidateById(CANDIDATE_ID);
 
-        assertTrue(result.isEmpty());
+        assertTrue(result == null);
     }
 
     @Test

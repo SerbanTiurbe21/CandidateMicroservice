@@ -18,25 +18,17 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class Candidate {
-
     @Id
     private String id;
-
     @Size(min = 3, message = "Please provide a valid name")
     private String name;
-
     private String position;
-
     @Pattern(regexp = "^[+]?[0-9]{10,13}$", message = "Please provide a valid phone number")
     private String phoneNumber;
-
     @Pattern(regexp = "((https?://)([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?)?", message = "Please provide a valid link")
     private String cvLink;
-
     @Email(regexp = ".+@.+\\..+", message = "Please provide a valid email address")
     private String email;
-
     private LocalDate interviewDate;
-
     private String documentId;
 }

@@ -9,7 +9,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,8 +34,9 @@ public class CandidateServiceImpl implements CandidateService {
         return candidateRepository.findByPosition(sort, position);
     }
 
-    public Optional<Candidate> getCandidateById(String id) {
-        return candidateRepository.findById(id);
+    public Candidate getCandidateById(String id) {
+        return candidateRepository.findById(id)
+                .orElseThrow(() -> new CandidateNotFoundException("Candidate not exist with id: " + id));
     }
 
     public Candidate updateCandidate(String id, Candidate updatedCandidate) {
