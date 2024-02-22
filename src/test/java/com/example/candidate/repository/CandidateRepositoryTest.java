@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @DataMongoTest
-public class CandidateRepositoryTest {
+class CandidateRepositoryTest {
     @Autowired
     private CandidateRepository candidateRepository;
 
@@ -33,32 +33,32 @@ public class CandidateRepositoryTest {
     }
 
     @Test
-    public void shouldFindCandidateByPosition() {
+    void shouldFindCandidateByPosition() {
         Sort sort = Sort.by(Sort.Direction.ASC, "name");
         List<Candidate> candidates = candidateRepository.findByPosition(sort, "Developer");
         assertThat(candidates).hasSize(2);
     }
 
     @Test
-    public void shouldCheckIfCandidateExistsByPhoneNumber() {
+    void shouldCheckIfCandidateExistsByPhoneNumber() {
         boolean exists = candidateRepository.existsByPhoneNumber("1234567890");
         assertThat(exists).isTrue();
     }
 
     @Test
-    public void shouldCheckIfCandidateExistsByEmail() {
+    void shouldCheckIfCandidateExistsByEmail() {
         boolean exists = candidateRepository.existsByEmail("jane.doe@example.com");
         assertThat(exists).isTrue();
     }
 
     @Test
-    public void shouldFindCandidateByNameIgnoreCase() {
+    void shouldFindCandidateByNameIgnoreCase() {
         List<Candidate> candidates = candidateRepository.findByNameIgnoreCase("john doe");
         assertThat(candidates).hasSize(1);
     }
 
     @Test
-    public void shouldFindAllCandidates() {
+    void shouldFindAllCandidates() {
         Sort sort = Sort.by(Sort.Direction.ASC, "name");
         List<Candidate> candidates = candidateRepository.findAll(sort);
         assertThat(candidates).hasSize(2);

@@ -1,5 +1,6 @@
 package com.example.candidate.service;
 
+import com.example.candidate.exception.CandidateNotFoundException;
 import com.example.candidate.exception.DuplicateCandidateException;
 import com.example.candidate.model.Candidate;
 import com.example.candidate.repository.CandidateRepository;
@@ -24,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CandidateServiceTest {
+class CandidateServiceTest {
     @Mock
     private CandidateRepository candidateRepository;
     @InjectMocks
@@ -42,7 +43,7 @@ public class CandidateServiceTest {
     }
 
     @Test
-    public void shouldAddCandidate(){
+    void shouldAddCandidate(){
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
         when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(false);
         when(candidateRepository.save(candidate)).thenReturn(candidate);
@@ -54,14 +55,14 @@ public class CandidateServiceTest {
     }
 
     @Test
-    public void addCandidateShouldThrowExceptionWhenCandidateWithPhoneNumberAlreadyExist(){
+    void addCandidateShouldThrowExceptionWhenCandidateWithPhoneNumberAlreadyExist(){
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(true);
 
         assertThrows(DuplicateCandidateException.class, () -> candidateService.addCandidate(candidate));
     }
 
     @Test
-    public void addCandidateShouldThrowExceptionWhenCandidateWithEmailAlreadyExist(){
+    void addCandidateShouldThrowExceptionWhenCandidateWithEmailAlreadyExist(){
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
         when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(true);
 
@@ -69,7 +70,7 @@ public class CandidateServiceTest {
     }
 
     @Test
-    public void shouldGetAllCandidates(){
+    void shouldGetAllCandidates(){
         when(candidateRepository.findAll(any(Sort.class))).thenReturn(Collections.singletonList(candidate));
 
         List<Candidate> candidates = candidateService.getAllCandidates();
@@ -80,7 +81,7 @@ public class CandidateServiceTest {
     }
 
     @Test
-    public void shouldGetCandidateByPosition(){
+    void shouldGetCandidateByPosition(){
         when(candidateRepository.findByPosition(any(Sort.class), eq(candidate.getPosition()))).thenReturn(Collections.singletonList(candidate));
 
         List<Candidate> candidates = candidateService.getCandidateByPosition(candidate.getPosition());
@@ -91,7 +92,7 @@ public class CandidateServiceTest {
     }
 
     @Test
-    public void shouldGetCandidateById(){
+    void shouldGetCandidateById(){
         when(candidateRepository.findById(candidate.getId())).thenReturn(Optional.ofNullable(candidate));
 
         Candidate foundCandidate = candidateService.getCandidateById(candidate.getId());
@@ -101,14 +102,15 @@ public class CandidateServiceTest {
     }
 
     @Test
-    public void getCandidateByIdShouldThrowExceptionWhenCandidateNotFound(){
+    void getCandidateByIdShouldThrowExceptionWhenCandidateNotFound() {
         when(candidateRepository.findById(candidate.getId())).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> candidateService.getCandidateById(candidate.getId()));
+        assertThrows(CandidateNotFoundException.class, () -> candidateService.getCandidateById(candidate.getId()));
     }
 
+
     @Test
-    public void shouldUpdateCandidate(){
+    void shouldUpdateCandidate(){
         when(candidateRepository.findById(candidate.getId())).thenReturn(Optional.ofNullable(candidate));
         when(candidateRepository.save(candidate)).thenReturn(candidate);
 
@@ -119,14 +121,14 @@ public class CandidateServiceTest {
     }
 
     @Test
-    public void updateCandidateShouldThrowExceptionWhenCandidateNotFound(){
+    void updateCandidateShouldThrowExceptionWhenCandidateNotFound(){
         when(candidateRepository.findById(candidate.getId())).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> candidateService.updateCandidate(candidate.getId(), candidate));
     }
 
     @Test
-    public void shouldGetCandidateByName(){
+    void shouldGetCandidateByName(){
         when(candidateRepository.findByNameIgnoreCase(candidate.getName())).thenReturn(Collections.singletonList(candidate));
 
         List<Candidate> candidates = candidateService.getCandidateByName(candidate.getName());

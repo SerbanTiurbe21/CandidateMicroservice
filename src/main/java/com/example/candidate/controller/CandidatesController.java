@@ -66,7 +66,7 @@ public class CandidatesController {
             @ApiResponse(responseCode = "404", description = "Candidate not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCandidate(
+    public ResponseEntity<Candidate> updateCandidate(
             @Parameter(description = "ID of the candidate to be updated") @PathVariable String id,
             @Parameter(description = "Candidate object containing the updated information") @Valid @RequestBody Candidate candidate) {
         Candidate updatedCandidate = candidateService.updateCandidate(id, candidate);

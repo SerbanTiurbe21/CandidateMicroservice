@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CandidateControllerTest {
+class CandidateControllerTest {
     @Mock
     private CandidateService candidateService;
     @InjectMocks
@@ -39,7 +39,7 @@ public class CandidateControllerTest {
     }
 
     @Test
-    public void shouldAddCandidate() {
+    void shouldAddCandidate() {
         when(candidateService.addCandidate(any(Candidate.class))).thenReturn(candidate);
 
         ResponseEntity<Candidate> response = candidatesController.addCandidate(candidate);
@@ -50,7 +50,7 @@ public class CandidateControllerTest {
     }
 
     @Test
-    public void shouldGetAllCandidates() {
+    void shouldGetAllCandidates() {
         when(candidateService.getAllCandidates()).thenReturn(List.of(candidate));
 
         ResponseEntity<List<Candidate>> response = candidatesController.getAllCandidates();
@@ -61,7 +61,7 @@ public class CandidateControllerTest {
     }
 
     @Test
-    public void shouldGetCandidateById() {
+    void shouldGetCandidateById() {
         when(candidateService.getCandidateById("1")).thenReturn(candidate);
 
         ResponseEntity<Candidate> response = candidatesController.getCandidateById("1");
@@ -72,7 +72,7 @@ public class CandidateControllerTest {
     }
 
     @Test
-    public void shouldUpdateCandidate(){
+    void shouldUpdateCandidate(){
         when(candidateService.updateCandidate(eq(candidate.getId()), any(Candidate.class))).thenReturn(candidate);
 
         ResponseEntity<?> response = candidatesController.updateCandidate(candidate.getId(), candidate);
@@ -83,7 +83,7 @@ public class CandidateControllerTest {
     }
 
     @Test
-    public void shouldGetCandidateByPosition() {
+    void shouldGetCandidateByPosition() {
         when(candidateService.getCandidateByPosition("Developer")).thenReturn(List.of(candidate));
 
         ResponseEntity<List<Candidate>> response = candidatesController.getCandidateByPosition("Developer");
@@ -94,7 +94,7 @@ public class CandidateControllerTest {
     }
 
     @Test
-    public void shouldGetCandidateByName() {
+    void shouldGetCandidateByName() {
         when(candidateService.getCandidateByName("John Doe")).thenReturn(List.of(candidate));
 
         ResponseEntity<List<Candidate>> response = candidatesController.getCandidateByName("John Doe");
