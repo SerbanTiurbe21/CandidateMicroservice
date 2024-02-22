@@ -35,7 +35,7 @@ public class CandidatesController {
             @Parameter(description = "Candidate object containing the necessary information to create a new candidate record. This includes personal details, qualifications, and any other relevant information.")
             @Valid @RequestBody Candidate candidate) {
         Candidate addedCandidate = candidateService.addCandidate(candidate);
-        return new ResponseEntity<>(addedCandidate, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedCandidate);
     }
 
     @Operation(summary = "Get all candidates", description = "Retrieves a l ist of all candidates")
