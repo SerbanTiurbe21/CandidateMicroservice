@@ -58,7 +58,7 @@ public class CandidatesController {
             @ApiResponse(responseCode = "200", description = "Candidate retrieved successfully", content = @Content(schema = @Schema(implementation = Candidate.class))),
             @ApiResponse(responseCode = "404", description = "Candidate not found")
     })
-    @PreAuthorize("hasRole('ROLE_client-hr' or 'ROLE_client-developer')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-developer')")
     @GetMapping("/{id}")
     public Mono<ResponseEntity<Candidate>> getCandidateById(
             @Parameter(description = "ID of the candidate to be retrieved") @PathVariable String id) {
@@ -98,7 +98,7 @@ public class CandidatesController {
             @ApiResponse(responseCode = "200", description = "Candidates retrieved successfully", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Candidate.class)))),
             @ApiResponse(responseCode = "404", description = "No candidates found")
     })
-    @PreAuthorize("hasRole('ROLE_client-hr' or 'ROLE_client-developer')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-developer')")
     @GetMapping(params = "name")
     public Mono<ResponseEntity<List<Candidate>>> getCandidateByName(
             @Parameter(description = "Name of the candidates to be retrieved") @RequestParam String name) {
