@@ -11,4 +11,5 @@ public interface CandidateService {
     List<Candidate> getCandidateByPosition(String position);
     Candidate updateCandidate(String id, Candidate candidate);
     List<Candidate> getCandidateByName(String name);
+    List<Candidate> findCandidatesByAssignedTo(String assignedToId);
 }

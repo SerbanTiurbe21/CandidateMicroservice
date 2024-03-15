@@ -15,4 +15,5 @@ public interface CandidateRepository extends MongoRepository<Candidate, String> 
     boolean existsByEmail(String email);
     List<Candidate> findByNameIgnoreCase(String name);
     @NonNull List<Candidate> findAll(@NonNull Sort sort);
+    List<Candidate> findCandidatesByAssignedTo(String assignedToId);
 }

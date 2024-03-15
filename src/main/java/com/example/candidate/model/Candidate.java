@@ -31,4 +31,5 @@ public class Candidate {
     private String email;
     private LocalDate interviewDate;
     private String documentId;
+    private String assignedTo;
 }

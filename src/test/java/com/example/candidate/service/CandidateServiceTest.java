@@ -18,7 +18,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -34,7 +36,7 @@ class CandidateServiceTest {
 
     @BeforeEach
     void setUp() {
-        candidate = new Candidate("1", "John Doe", "Developer", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null);
+        candidate = new Candidate("1", "John Doe", "Developer", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null);
     }
 
     @AfterEach
@@ -136,5 +138,23 @@ class CandidateServiceTest {
         assertNotNull(candidates);
 
         verify(candidateRepository).findByNameIgnoreCase(candidate.getName());
+    }
+
+    @Test
+    void shouldFindCandidatesByAssignedTo(){
+        when(candidateRepository.findCandidatesByAssignedTo(candidate.getAssignedTo())).thenReturn(Collections.singletonList(candidate));
+
+        List<Candidate> candidates = candidateService.findCandidatesByAssignedTo(candidate.getAssignedTo());
+        assertFalse(candidates.isEmpty());
+        assertNotNull(candidates);
+
+        verify(candidateRepository).findCandidatesByAssignedTo(candidate.getAssignedTo());
+    }
+
+    @Test
+    void findCandidatesByAssignedToShouldThrowExceptionWhenNoCandidatesFound(){
+        when(candidateRepository.findCandidatesByAssignedTo(candidate.getAssignedTo())).thenReturn(Collections.emptyList());
+
+        assertThrows(CandidateNotFoundException.class, () -> candidateService.findCandidatesByAssignedTo(candidate.getAssignedTo()));
     }
 }

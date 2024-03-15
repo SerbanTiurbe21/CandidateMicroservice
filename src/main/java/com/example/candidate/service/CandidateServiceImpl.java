@@ -50,11 +50,21 @@ public class CandidateServiceImpl implements CandidateService {
         candidate.setCvLink(updatedCandidate.getCvLink());
         candidate.setInterviewDate(updatedCandidate.getInterviewDate());
         candidate.setDocumentId(updatedCandidate.getDocumentId());
+        candidate.setAssignedTo(updatedCandidate.getAssignedTo());
 
         return candidateRepository.save(candidate);
     }
 
     public List<Candidate> getCandidateByName(String name) {
         return candidateRepository.findByNameIgnoreCase(name);
+    }
+
+    @Override
+    public List<Candidate> findCandidatesByAssignedTo(String assignedToId) {
+        List<Candidate> assignedCandidates = candidateRepository.findCandidatesByAssignedTo(assignedToId);
+        if(assignedCandidates.isEmpty()) {
+            throw new CandidateNotFoundException("No candidates found assigned to developer with ID: " + assignedToId);
+        }
+        return assignedCandidates;
     }
 }
