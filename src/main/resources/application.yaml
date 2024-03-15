@@ -1,6 +1,6 @@
 spring:
   application:
-    name: questions-service
+    name: candidates-service
   data:
     mongodb:
       uri: mongodb+srv://serbantiurbe:gfKlzad6pSyYoVEA@interviewcompanionappcl.0dt0g6v.mongodb.net/?retryWrites=true&w=majority&appName=InterviewCompanionAppCluster
