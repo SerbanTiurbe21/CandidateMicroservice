@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -34,5 +36,13 @@ class PositionsRepositoryTest {
     void shouldReturnTrueIfPositionExistsByName() {
         boolean exists = positionsRepository.existsByName("Developer");
         assertThat(exists).isTrue();
+    }
+
+    @Test
+    void shouldReturnPositionByName() {
+        Optional<Position> optionalPosition = positionsRepository.findByName("Developer");
+        assertThat(optionalPosition).isPresent();
+        Position position = optionalPosition.orElseThrow(() -> new NoSuchElementException("Position not found"));
+        assertThat(position).isEqualTo(position1);
     }
 }

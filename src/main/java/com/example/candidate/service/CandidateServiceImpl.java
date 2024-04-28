@@ -15,12 +15,18 @@ import java.util.List;
 public class CandidateServiceImpl implements CandidateService {
 
     private final CandidateRepository candidateRepository;
+    private final PositionsService positionsService;
 
     public Candidate addCandidate(Candidate candidate) {
-        if (candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber()))
+        if( positionsService.getPositionByName(candidate.getPosition()) == null){
+            throw new CandidateNotFoundException("Position with name " + candidate.getPosition() + " not found");
+        }
+        if (candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())){
             throw new DuplicateCandidateException("Candidate with this phone number already exist");
-        if (candidateRepository.existsByEmail(candidate.getEmail()))
+        }
+        if (candidateRepository.existsByEmail(candidate.getEmail())){
             throw new DuplicateCandidateException("Candidate with this email already exist");
+        }
         return candidateRepository.save(candidate);
     }
 

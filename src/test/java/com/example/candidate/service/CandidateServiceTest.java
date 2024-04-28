@@ -3,6 +3,7 @@ package com.example.candidate.service;
 import com.example.candidate.exception.CandidateNotFoundException;
 import com.example.candidate.exception.DuplicateCandidateException;
 import com.example.candidate.model.Candidate;
+import com.example.candidate.model.Position;
 import com.example.candidate.repository.CandidateRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,8 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CandidateServiceTest {
@@ -33,6 +33,8 @@ class CandidateServiceTest {
     @InjectMocks
     private CandidateServiceImpl candidateService;
     private Candidate candidate;
+    @Mock
+    private PositionsService positionsService;
 
     @BeforeEach
     void setUp() {
@@ -49,6 +51,7 @@ class CandidateServiceTest {
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
         when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(false);
         when(candidateRepository.save(candidate)).thenReturn(candidate);
+        when(positionsService.getPositionByName(candidate.getPosition())).thenReturn(Position.builder().name(candidate.getPosition()).build());
 
         Candidate addedCandidate = candidateService.addCandidate(candidate);
         assertNotNull(addedCandidate);
@@ -58,6 +61,7 @@ class CandidateServiceTest {
 
     @Test
     void addCandidateShouldThrowExceptionWhenCandidateWithPhoneNumberAlreadyExist(){
+        when(positionsService.getPositionByName(candidate.getPosition())).thenReturn(Position.builder().name(candidate.getPosition()).build());
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(true);
 
         assertThrows(DuplicateCandidateException.class, () -> candidateService.addCandidate(candidate));
@@ -65,10 +69,20 @@ class CandidateServiceTest {
 
     @Test
     void addCandidateShouldThrowExceptionWhenCandidateWithEmailAlreadyExist(){
+        when(positionsService.getPositionByName(candidate.getPosition())).thenReturn(Position.builder().name(candidate.getPosition()).build());
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
         when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(true);
 
         assertThrows(DuplicateCandidateException.class, () -> candidateService.addCandidate(candidate));
+    }
+
+    @Test
+    void addCandidateShouldThrowExceptionWhenPositionNotFound(){
+        lenient().when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
+        lenient().when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(false);
+        when(positionsService.getPositionByName(candidate.getPosition())).thenReturn(null);
+
+        assertThrows(CandidateNotFoundException.class, () -> candidateService.addCandidate(candidate));
     }
 
     @Test

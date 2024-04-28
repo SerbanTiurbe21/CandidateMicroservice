@@ -24,6 +24,11 @@ public class PositionsServiceImpl implements PositionsService{
     }
 
     @Override
+    public Position getPositionByName(String name) {
+       return positionsRepository.findByName(name).orElseThrow(() -> new PositionNotFoundException("Position with name " + name + " not found"));
+    }
+
+    @Override
     public Position addPosition(Position position) {
         if(positionsRepository.existsByName(position.getName())){
             throw new PositionAlreadyExistsException("Position with name " + position.getName() + " already exists");

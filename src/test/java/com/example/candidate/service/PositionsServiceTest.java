@@ -16,7 +16,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -64,6 +66,23 @@ class PositionsServiceTest {
         when(positionsRepository.findById(position.getId())).thenReturn(Optional.empty());
 
         assertThrows(PositionNotFoundException.class, () -> positionsService.getPositionById(position.getId()));
+    }
+
+    @Test
+    void shouldGetPositionByName(){
+        when(positionsRepository.findByName(position.getName())).thenReturn(Optional.of(position));
+
+        Position positionByName = positionsService.getPositionByName(position.getName());
+        assertNotNull(positionByName);
+
+        verify(positionsRepository).findByName(position.getName());
+    }
+
+    @Test
+    void getPositionByNameShouldThrowExceptionWhenPositionNotFound(){
+        when(positionsRepository.findByName(position.getName())).thenReturn(Optional.empty());
+
+        assertThrows(PositionNotFoundException.class, () -> positionsService.getPositionByName(position.getName()));
     }
 
     @Test
