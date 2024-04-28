@@ -62,7 +62,7 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public List<Candidate> findCandidatesByAssignedTo(String assignedToId) {
         List<Candidate> assignedCandidates = candidateRepository.findCandidatesByAssignedTo(assignedToId);
-        if(assignedCandidates.isEmpty()) {
+        if (assignedCandidates.isEmpty()) {
             throw new CandidateNotFoundException("No candidates found assigned to developer with ID: " + assignedToId);
         }
         return assignedCandidates;
