@@ -33,7 +33,7 @@ public class CandidatesController {
             @ApiResponse(responseCode = "201", description = "Candidate created successfully", content = @Content(schema = @Schema(implementation = Candidate.class))),
             @ApiResponse(responseCode = "400", description = "Validation failed")
     })
-    @PreAuthorize("hasRole('ROLE_client-hr')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
     @PostMapping
     public Mono<ResponseEntity<Candidate>> addCandidate(
             @Parameter(description = "Candidate object containing the necessary information to create a new candidate record. This includes personal details, qualifications, and any other relevant information.")
@@ -46,7 +46,7 @@ public class CandidatesController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Candidates retrieved successfully", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Candidate.class))))
     })
-    @PreAuthorize("hasRole('ROLE_client-hr')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
     @GetMapping
     public Mono<ResponseEntity<List<Candidate>>> getAllCandidates() {
         return Mono.just(ResponseEntity.ok(candidateService.getAllCandidates()));
@@ -57,7 +57,7 @@ public class CandidatesController {
             @ApiResponse(responseCode = "200", description = "Candidate retrieved successfully", content = @Content(schema = @Schema(implementation = Candidate.class))),
             @ApiResponse(responseCode = "404", description = "Candidate not found")
     })
-    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-developer')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-developer') or hasRole('ROLE_client-admin')")
     @GetMapping("/{id}")
     public Mono<ResponseEntity<Candidate>> getCandidateById(
             @Parameter(description = "ID of the candidate to be retrieved") @PathVariable String id) {
@@ -71,7 +71,7 @@ public class CandidatesController {
             @ApiResponse(responseCode = "400", description = "Validation failed"),
             @ApiResponse(responseCode = "404", description = "Candidate not found")
     })
-    @PreAuthorize("hasRole('ROLE_client-hr')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
     @PutMapping("/{id}")
     public Mono<ResponseEntity<Candidate>> updateCandidate(
             @Parameter(description = "ID of the candidate to be updated") @PathVariable String id,
@@ -85,7 +85,7 @@ public class CandidatesController {
             @ApiResponse(responseCode = "200", description = "Candidates retrieved successfully", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Candidate.class)))),
             @ApiResponse(responseCode = "404", description = "No candidates found")
     })
-    @PreAuthorize("hasRole('ROLE_client-hr')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
     @GetMapping(params = "position")
     public Mono<ResponseEntity<List<Candidate>>> getCandidateByPosition(
             @Parameter(description = "Position of the candidates to be retrieved") @RequestParam String position) {
@@ -97,7 +97,7 @@ public class CandidatesController {
             @ApiResponse(responseCode = "200", description = "Candidates retrieved successfully", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Candidate.class)))),
             @ApiResponse(responseCode = "404", description = "No candidates found")
     })
-    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-developer')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-developer') or hasRole('ROLE_client-admin')")
     @GetMapping(params = "name")
     public Mono<ResponseEntity<List<Candidate>>> getCandidateByName(
             @Parameter(description = "Name of the candidates to be retrieved") @RequestParam String name) {
@@ -109,7 +109,7 @@ public class CandidatesController {
             @ApiResponse(responseCode = "200", description = "Candidates retrieved successfully", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Candidate.class)))),
             @ApiResponse(responseCode = "404", description = "No candidates found")
     })
-    @PreAuthorize("hasRole('ROLE_client-developer')")
+    @PreAuthorize("hasRole('ROLE_client-developer') or hasRole('ROLE_client-admin')")
     @GetMapping("/assigned/{developerId}")
     public Mono<ResponseEntity<List<Candidate>>> getCandidatesAssignedToDeveloper(@PathVariable String developerId) {
         List<Candidate> assignedCandidates = candidateService.findCandidatesByAssignedTo(developerId);

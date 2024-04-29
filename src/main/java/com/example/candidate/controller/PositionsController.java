@@ -27,7 +27,7 @@ public class PositionsController {
             @ApiResponse(responseCode = "200", description = "Positions retrieved successfully")
     })
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_client-hr')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
     public Mono<ResponseEntity<List<Position>>> getAllPositions() {
         return Mono.just(ResponseEntity.ok(positionsService.getAllPositions()));
     }
@@ -38,7 +38,7 @@ public class PositionsController {
             @ApiResponse(responseCode = "404", description = "Position not found")
     })
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_client-hr')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
     public Mono<ResponseEntity<Position>> getPositionById(@PathVariable String id) {
         return Mono.just(ResponseEntity.ok(positionsService.getPositionById(id)));
     }
@@ -49,7 +49,7 @@ public class PositionsController {
             @ApiResponse(responseCode = "400", description = "Validation failed")
     })
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_client-hr')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
     public Mono<ResponseEntity<Position>> addPosition(@RequestBody @Valid Position position) {
         Position addedPosition = positionsService.addPosition(position);
         return Mono.just(ResponseEntity.ok(addedPosition));
@@ -62,7 +62,7 @@ public class PositionsController {
             @ApiResponse(responseCode = "404", description = "Position not found")
     })
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_client-hr')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
     public Mono<ResponseEntity<Position>> updatePosition(@PathVariable String id, @RequestBody @Valid Position position) {
         Position updatedPosition = positionsService.updatePosition(id, position);
         return Mono.just(ResponseEntity.ok(updatedPosition));
@@ -74,7 +74,7 @@ public class PositionsController {
             @ApiResponse(responseCode = "404", description = "Position not found")
     })
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_client-hr')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
     public Mono<ResponseEntity<Void>> deletePosition(@PathVariable String id) {
         positionsService.deletePosition(id);
         return Mono.just(ResponseEntity.noContent().build());
