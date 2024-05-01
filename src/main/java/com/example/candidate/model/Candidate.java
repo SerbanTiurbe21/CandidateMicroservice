@@ -22,7 +22,6 @@ public class Candidate {
     private String id;
     @Size(min = 3, message = "Please provide a valid name")
     private String name;
-    private String position;
     @Pattern(regexp = "^[+]?[0-9]{10,13}$", message = "Please provide a valid phone number")
     private String phoneNumber;
     @Pattern(regexp = "((https?://)([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?)?", message = "Please provide a valid link")
@@ -32,4 +31,5 @@ public class Candidate {
     private LocalDate interviewDate;
     private String documentId;
     private String assignedTo;
+    private String positionId;
 }

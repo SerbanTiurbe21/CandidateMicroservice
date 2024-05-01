@@ -1,6 +1,7 @@
 package com.example.candidate.repository;
 
 import com.example.candidate.model.Position;
+import com.example.candidate.model.Status;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataMongoTest
 class PositionsRepositoryTest {
@@ -21,8 +23,8 @@ class PositionsRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        position = new Position("1", "Project Manager");
-        position1 = new Position("2", "Developer");
+        position = new Position("1", "Project Manager", Status.OPEN);
+        position1 = new Position("2", "Developer", Status.OPEN);
         positionsRepository.saveAll(List.of(position, position1));
     }
 
@@ -44,5 +46,12 @@ class PositionsRepositoryTest {
         assertThat(optionalPosition).isPresent();
         Position position = optionalPosition.orElseThrow(() -> new NoSuchElementException("Position not found"));
         assertThat(position).isEqualTo(position1);
+    }
+
+    @Test
+    void shouldReturnListOfPositionsByStatus() {
+        List<Position> positions = positionsRepository.findPositionsByStatus(Status.OPEN);
+        assertTrue(positions.contains(position));
+        assertTrue(positions.contains(position1));
     }
 }

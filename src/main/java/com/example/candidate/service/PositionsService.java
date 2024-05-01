@@ -11,4 +11,5 @@ public interface PositionsService {
     Position addPosition(Position position);
     Position updatePosition(String id, Position position);
     void deletePosition(String id);
+    List<Position> getPositionsByStatus(String status);
 }

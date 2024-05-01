@@ -17,8 +17,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doNothing;
 
 @ExtendWith(MockitoExtension.class)
 class CandidateControllerTest {
@@ -30,7 +31,7 @@ class CandidateControllerTest {
 
     @BeforeEach
     void setUp() {
-        candidate = new Candidate("1", "John Doe", "Developer", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null);
+        candidate = new Candidate("1", "John Doe", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null, null);
     }
 
     @AfterEach
@@ -87,18 +88,6 @@ class CandidateControllerTest {
     }
 
     @Test
-    void shouldGetCandidateByPosition() {
-        when(candidateService.getCandidateByPosition("Developer")).thenReturn(List.of(candidate));
-
-        ResponseEntity<List<Candidate>> response = candidatesController.getCandidateByPosition("Developer").block();
-
-        assert response != null;
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(List.of(candidate), response.getBody());
-        verify(candidateService).getCandidateByPosition("Developer");
-    }
-
-    @Test
     void shouldGetCandidateByName() {
         when(candidateService.getCandidateByName("John Doe")).thenReturn(List.of(candidate));
 
@@ -120,5 +109,28 @@ class CandidateControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(List.of(candidate), response.getBody());
         verify(candidateService).findCandidatesByAssignedTo("1");
+    }
+
+    @Test
+    void shouldDeleteCandidate() {
+        doNothing().when(candidateService).deleteCandidate("1");
+
+        ResponseEntity<Void> response = candidatesController.deleteCandidate("1").block();
+
+        assert response != null;
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(candidateService).deleteCandidate("1");
+    }
+
+    @Test
+    void shouldGetCandidatesByPositionId() {
+        when(candidateService.getCandidatesByPositionId("1")).thenReturn(List.of(candidate));
+
+        ResponseEntity<List<Candidate>> response = candidatesController.getCandidatesByPositionId("1").block();
+
+        assert response != null;
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(List.of(candidate), response.getBody());
+        verify(candidateService).getCandidatesByPositionId("1");
     }
 }

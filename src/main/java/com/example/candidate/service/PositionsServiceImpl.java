@@ -3,6 +3,7 @@ package com.example.candidate.service;
 import com.example.candidate.exception.PositionAlreadyExistsException;
 import com.example.candidate.exception.PositionNotFoundException;
 import com.example.candidate.model.Position;
+import com.example.candidate.model.Status;
 import com.example.candidate.repository.PositionsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,11 +41,17 @@ public class PositionsServiceImpl implements PositionsService{
     public Position updatePosition(String id, Position position) {
         Position positionToUpdate = positionsRepository.findById(id).orElseThrow(() -> new PositionNotFoundException("Position with id " + id + " not found"));
         positionToUpdate.setName(position.getName());
+        positionToUpdate.setStatus(position.getStatus());
         return positionsRepository.save(positionToUpdate);
     }
 
     @Override
     public void deletePosition(String id) {
         positionsRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Position> getPositionsByStatus(String status) {
+        return positionsRepository.findPositionsByStatus(Status.valueOf(status));
     }
 }

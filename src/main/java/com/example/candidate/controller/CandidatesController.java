@@ -80,18 +80,6 @@ public class CandidatesController {
         return Mono.just(ResponseEntity.ok(updatedCandidate));
     }
 
-    @Operation(summary = "Get candidates by position", description = "Retrieves candidates by their position")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Candidates retrieved successfully", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Candidate.class)))),
-            @ApiResponse(responseCode = "404", description = "No candidates found")
-    })
-    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
-    @GetMapping(params = "position")
-    public Mono<ResponseEntity<List<Candidate>>> getCandidateByPosition(
-            @Parameter(description = "Position of the candidates to be retrieved") @RequestParam String position) {
-        return Mono.just(ResponseEntity.ok(candidateService.getCandidateByPosition(position)));
-    }
-
     @Operation(summary = "Get candidates by name", description = "Retrieves candidates by their name")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Candidates retrieved successfully", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Candidate.class)))),
@@ -114,5 +102,29 @@ public class CandidatesController {
     public Mono<ResponseEntity<List<Candidate>>> getCandidatesAssignedToDeveloper(@PathVariable String developerId) {
         List<Candidate> assignedCandidates = candidateService.findCandidatesByAssignedTo(developerId);
         return Mono.just(ResponseEntity.ok(assignedCandidates));
+    }
+
+    @Operation(summary = "Delete a candidate", description = "Deletes a candidate by their ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Candidate deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Candidate not found")
+    })
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
+    @DeleteMapping("/{id}")
+    public Mono<ResponseEntity<Void>> deleteCandidate(
+            @Parameter(description = "ID of the candidate to be deleted") @PathVariable String id) {
+        candidateService.deleteCandidate(id);
+        return Mono.just(ResponseEntity.noContent().build());
+    }
+    @Operation(summary = "Get candidates by position id", description = "Returns a list of candidates based on the position ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Candidates retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No candidates found")
+    })
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
+    @GetMapping("/position/{positionId}")
+    public Mono<ResponseEntity<List<Candidate>>> getCandidatesByPositionId(
+            @Parameter(description = "ID of the position to retrieve candidates") @PathVariable String positionId) {
+        return Mono.just(ResponseEntity.ok(candidateService.getCandidatesByPositionId(positionId)));
     }
 }

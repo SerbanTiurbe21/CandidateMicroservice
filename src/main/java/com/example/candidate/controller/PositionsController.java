@@ -80,4 +80,14 @@ public class PositionsController {
         return Mono.just(ResponseEntity.noContent().build());
     }
 
+    @Operation(summary = "Get positions by status", description = "Retrieves positions by their status")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Positions retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No positions found")
+    })
+    @GetMapping(params = "status")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
+    public Mono<ResponseEntity<List<Position>>> getPositionsByStatus(@RequestParam String status) {
+        return Mono.just(ResponseEntity.ok(positionsService.getPositionsByStatus(status)));
+    }
 }

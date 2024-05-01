@@ -3,6 +3,7 @@ package com.example.candidate.service;
 import com.example.candidate.exception.PositionAlreadyExistsException;
 import com.example.candidate.exception.PositionNotFoundException;
 import com.example.candidate.model.Position;
+import com.example.candidate.model.Status;
 import com.example.candidate.repository.PositionsRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +33,7 @@ class PositionsServiceTest {
 
     @BeforeEach
     void setUp() {
-        position = new Position("1", "Project Manager");
+        position = new Position("1", "Project Manager", Status.OPEN);
     }
 
     @AfterEach
@@ -105,7 +106,7 @@ class PositionsServiceTest {
 
     @Test
     void shouldUpdatePosition(){
-        Position updatedPosition = new Position("1", "Software Developer");
+        Position updatedPosition = new Position("1", "Software Developer", Status.OPEN);
         when(positionsRepository.findById(position.getId())).thenReturn(Optional.of(position));
         when(positionsRepository.save(position)).thenReturn(updatedPosition);
 
@@ -117,7 +118,7 @@ class PositionsServiceTest {
 
     @Test
     void updatePositionShouldThrowExceptionWhenPositionNotFound(){
-        Position updatedPosition = new Position("1", "Software Developer");
+        Position updatedPosition = new Position("1", "Software Developer", Status.OPEN);
         when(positionsRepository.findById(position.getId())).thenReturn(Optional.empty());
 
         assertThrows(PositionNotFoundException.class, () -> positionsService.updatePosition(position.getId(), updatedPosition));
@@ -127,5 +128,16 @@ class PositionsServiceTest {
     void shouldDeletePosition(){
         positionsService.deletePosition(position.getId());
         verify(positionsRepository).deleteById(position.getId());
+    }
+
+    @Test
+    void shouldGetPositionsByStatus(){
+        when(positionsRepository.findPositionsByStatus(Status.OPEN)).thenReturn(Collections.singletonList(position));
+
+        List<Position> positionsByStatus = positionsService.getPositionsByStatus(String.valueOf(Status.valueOf("OPEN")));
+        assertFalse(positionsByStatus.isEmpty());
+        assertNotNull(positionsByStatus);
+
+        verify(positionsRepository).findPositionsByStatus(Status.OPEN);
     }
 }

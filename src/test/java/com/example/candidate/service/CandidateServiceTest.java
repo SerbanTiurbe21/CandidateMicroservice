@@ -2,8 +2,10 @@ package com.example.candidate.service;
 
 import com.example.candidate.exception.CandidateNotFoundException;
 import com.example.candidate.exception.DuplicateCandidateException;
+import com.example.candidate.exception.PositionNotFoundException;
 import com.example.candidate.model.Candidate;
 import com.example.candidate.model.Position;
+import com.example.candidate.model.Status;
 import com.example.candidate.repository.CandidateRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +39,7 @@ class CandidateServiceTest {
 
     @BeforeEach
     void setUp() {
-        candidate = new Candidate("1", "John Doe", "Developer", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null);
+        candidate = new Candidate("1", "John Doe", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null, null);
     }
 
     @AfterEach
@@ -51,7 +52,7 @@ class CandidateServiceTest {
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
         when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(false);
         when(candidateRepository.save(candidate)).thenReturn(candidate);
-        when(positionsService.getPositionByName(candidate.getPosition())).thenReturn(Position.builder().name(candidate.getPosition()).build());
+        when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("").build());
 
         Candidate addedCandidate = candidateService.addCandidate(candidate);
         assertNotNull(addedCandidate);
@@ -61,7 +62,7 @@ class CandidateServiceTest {
 
     @Test
     void addCandidateShouldThrowExceptionWhenCandidateWithPhoneNumberAlreadyExist(){
-        when(positionsService.getPositionByName(candidate.getPosition())).thenReturn(Position.builder().name(candidate.getPosition()).build());
+        when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("").build());
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(true);
 
         assertThrows(DuplicateCandidateException.class, () -> candidateService.addCandidate(candidate));
@@ -69,7 +70,7 @@ class CandidateServiceTest {
 
     @Test
     void addCandidateShouldThrowExceptionWhenCandidateWithEmailAlreadyExist(){
-        when(positionsService.getPositionByName(candidate.getPosition())).thenReturn(Position.builder().name(candidate.getPosition()).build());
+        when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("").build());
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
         when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(true);
 
@@ -80,9 +81,9 @@ class CandidateServiceTest {
     void addCandidateShouldThrowExceptionWhenPositionNotFound(){
         lenient().when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
         lenient().when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(false);
-        when(positionsService.getPositionByName(candidate.getPosition())).thenReturn(null);
+        lenient().when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(null);
 
-        assertThrows(CandidateNotFoundException.class, () -> candidateService.addCandidate(candidate));
+        assertThrows(PositionNotFoundException.class, () -> candidateService.addCandidate(candidate));
     }
 
     @Test
@@ -94,17 +95,6 @@ class CandidateServiceTest {
         assertNotNull(candidates);
 
         verify(candidateRepository).findAll(any(Sort.class));
-    }
-
-    @Test
-    void shouldGetCandidateByPosition(){
-        when(candidateRepository.findByPosition(any(Sort.class), eq(candidate.getPosition()))).thenReturn(Collections.singletonList(candidate));
-
-        List<Candidate> candidates = candidateService.getCandidateByPosition(candidate.getPosition());
-        assertFalse(candidates.isEmpty());
-        assertNotNull(candidates);
-
-        verify(candidateRepository).findByPosition(any(Sort.class), eq(candidate.getPosition()));
     }
 
     @Test
@@ -123,7 +113,6 @@ class CandidateServiceTest {
 
         assertThrows(CandidateNotFoundException.class, () -> candidateService.getCandidateById(candidate.getId()));
     }
-
 
     @Test
     void shouldUpdateCandidate(){
@@ -170,5 +159,32 @@ class CandidateServiceTest {
         when(candidateRepository.findCandidatesByAssignedTo(candidate.getAssignedTo())).thenReturn(Collections.emptyList());
 
         assertThrows(CandidateNotFoundException.class, () -> candidateService.findCandidatesByAssignedTo(candidate.getAssignedTo()));
+    }
+
+    @Test
+    void shouldDeleteCandidate(){
+        when(candidateRepository.existsById(candidate.getId())).thenReturn(true);
+
+        candidateService.deleteCandidate(candidate.getId());
+
+        verify(candidateRepository).deleteById(candidate.getId());
+    }
+
+    @Test
+    void deleteCandidateShouldThrowExceptionWhenCandidateNotFound(){
+        when(candidateRepository.existsById(candidate.getId())).thenReturn(false);
+
+        assertThrows(CandidateNotFoundException.class, () -> candidateService.deleteCandidate(candidate.getId()));
+    }
+
+    @Test
+    void shouldGetCandidatesByPositionId(){
+        when(candidateRepository.findCandidatesByPositionId(candidate.getPositionId())).thenReturn(Collections.singletonList(candidate));
+
+        List<Candidate> candidates = candidateService.getCandidatesByPositionId(candidate.getPositionId());
+        assertFalse(candidates.isEmpty());
+        assertNotNull(candidates);
+
+        verify(candidateRepository).findCandidatesByPositionId(candidate.getPositionId());
     }
 }

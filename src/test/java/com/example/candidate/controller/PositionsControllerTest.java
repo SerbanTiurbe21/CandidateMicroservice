@@ -1,6 +1,7 @@
 package com.example.candidate.controller;
 
 import com.example.candidate.model.Position;
+import com.example.candidate.model.Status;
 import com.example.candidate.service.PositionsService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +30,7 @@ class PositionsControllerTest {
 
     @BeforeEach
     void setUp() {
-        position = new Position("1", "Project Manager");
+        position = new Position("1", "Project Manager", Status.OPEN);
     }
 
     @AfterEach
@@ -90,6 +91,18 @@ class PositionsControllerTest {
         positionsController.deletePosition("1").block();
 
         verify(positionsService).deletePosition("1");
+    }
+
+    @Test
+    void shouldGetPositionsByStatus() {
+        when(positionsService.getPositionsByStatus(String.valueOf(Status.OPEN))).thenReturn(List.of(position));
+
+        ResponseEntity<List<Position>> response = positionsController.getPositionsByStatus(String.valueOf(Status.OPEN)).block();
+
+        assert response != null;
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(List.of(position), response.getBody());
+        verify(positionsService).getPositionsByStatus(String.valueOf(Status.OPEN));
     }
 
 }

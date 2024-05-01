@@ -20,8 +20,8 @@ class CandidateRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        candidate = new Candidate("1", "John Doe", "Developer", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null);
-        candidate1 = new Candidate("2", "Jane Doe", "Developer", "1234567890", "http://example.com/cv", "jane.doe@example.com", null, null, null);
+        candidate = new Candidate("1", "John Doe", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null, null);
+        candidate1 = new Candidate("2", "Jane Doe", "1234567890", "http://example.com/cv", "jane.doe@example.com", null, null, null, null);
         candidateRepository.saveAll(List.of(candidate, candidate1));
     }
 
@@ -29,13 +29,6 @@ class CandidateRepositoryTest {
     public void tearDown() {
         candidateRepository.delete(candidate);
         candidateRepository.delete(candidate1);
-    }
-
-    @Test
-    void shouldFindCandidateByPosition() {
-        Sort sort = Sort.by(Sort.Direction.ASC, "name");
-        List<Candidate> candidates = candidateRepository.findByPosition(sort, "Developer");
-        assertThat(candidates).hasSize(2);
     }
 
     @Test
@@ -66,6 +59,12 @@ class CandidateRepositoryTest {
     @Test
     void shouldFindCandidatesByAssignedTo() {
         List<Candidate> candidates = candidateRepository.findCandidatesByAssignedTo("1");
+        assertThat(candidates).isEmpty();
+    }
+
+    @Test
+    void shouldFindCandidatesByPositionId() {
+        List<Candidate> candidates = candidateRepository.findCandidatesByPositionId("1");
         assertThat(candidates).isEmpty();
     }
 }

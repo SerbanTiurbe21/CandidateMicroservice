@@ -10,10 +10,10 @@ import java.util.List;
 
 @Repository
 public interface CandidateRepository extends MongoRepository<Candidate, String> {
-    List<Candidate> findByPosition(Sort sort, String position);
     boolean existsByPhoneNumber(String phoneNumber);
     boolean existsByEmail(String email);
     List<Candidate> findByNameIgnoreCase(String name);
     @NonNull List<Candidate> findAll(@NonNull Sort sort);
     List<Candidate> findCandidatesByAssignedTo(String assignedToId);
+    List<Candidate> findCandidatesByPositionId(String positionId);
 }

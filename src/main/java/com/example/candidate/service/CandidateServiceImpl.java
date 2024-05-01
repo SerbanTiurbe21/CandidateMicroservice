@@ -2,6 +2,7 @@ package com.example.candidate.service;
 
 import com.example.candidate.exception.CandidateNotFoundException;
 import com.example.candidate.exception.DuplicateCandidateException;
+import com.example.candidate.exception.PositionNotFoundException;
 import com.example.candidate.model.Candidate;
 import com.example.candidate.repository.CandidateRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,8 @@ public class CandidateServiceImpl implements CandidateService {
     private final PositionsService positionsService;
 
     public Candidate addCandidate(Candidate candidate) {
-        if( positionsService.getPositionByName(candidate.getPosition()) == null){
-            throw new CandidateNotFoundException("Position with name " + candidate.getPosition() + " not found");
+        if( positionsService.getPositionById(candidate.getPositionId()) == null){
+            throw new PositionNotFoundException("Position with id " + candidate.getPositionId() + " not found");
         }
         if (candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())){
             throw new DuplicateCandidateException("Candidate with this phone number already exist");
@@ -35,11 +36,6 @@ public class CandidateServiceImpl implements CandidateService {
         return candidateRepository.findAll(sort);
     }
 
-    public List<Candidate> getCandidateByPosition(String position) {
-        Sort sort = Sort.by(Sort.Direction.ASC, "name");
-        return candidateRepository.findByPosition(sort, position);
-    }
-
     public Candidate getCandidateById(String id) {
         return candidateRepository.findById(id)
                 .orElseThrow(() -> new CandidateNotFoundException("Candidate not exist with id: " + id));
@@ -50,7 +46,7 @@ public class CandidateServiceImpl implements CandidateService {
                 .orElseThrow(() -> new CandidateNotFoundException("Candidate with " + id + " not found"));
 
         candidate.setName(updatedCandidate.getName());
-        candidate.setPosition(updatedCandidate.getPosition());
+        candidate.setPositionId(updatedCandidate.getPositionId());
         candidate.setPhoneNumber(updatedCandidate.getPhoneNumber());
         candidate.setEmail(updatedCandidate.getEmail());
         candidate.setCvLink(updatedCandidate.getCvLink());
@@ -72,5 +68,18 @@ public class CandidateServiceImpl implements CandidateService {
             throw new CandidateNotFoundException("No candidates found assigned to developer with ID: " + assignedToId);
         }
         return assignedCandidates;
+    }
+
+    @Override
+    public void deleteCandidate(String id) {
+        if (!candidateRepository.existsById(id)) {
+            throw new CandidateNotFoundException("Candidate not exist with id: " + id);
+        }
+        candidateRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Candidate> getCandidatesByPositionId(String positionId) {
+        return candidateRepository.findCandidatesByPositionId(positionId);
     }
 }

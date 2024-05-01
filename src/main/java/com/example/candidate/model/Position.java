@@ -14,4 +14,6 @@ public class Position {
     private String id;
     @NonNull
     private String name;
+    @NonNull
+    private Status status;
 }
