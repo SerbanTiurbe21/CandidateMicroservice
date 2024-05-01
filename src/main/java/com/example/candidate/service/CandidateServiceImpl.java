@@ -4,6 +4,7 @@ import com.example.candidate.exception.CandidateNotFoundException;
 import com.example.candidate.exception.DuplicateCandidateException;
 import com.example.candidate.exception.PositionNotFoundException;
 import com.example.candidate.model.Candidate;
+import com.example.candidate.model.Position;
 import com.example.candidate.repository.CandidateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -19,7 +20,9 @@ public class CandidateServiceImpl implements CandidateService {
     private final PositionsService positionsService;
 
     public Candidate addCandidate(Candidate candidate) {
-        if( positionsService.getPositionById(candidate.getPositionId()) == null){
+        Position position = positionsService.getPositionById(candidate.getPositionId());
+        String positionName = position.getName();
+        if (positionsService.getPositionByName(positionName) == null) {
             throw new PositionNotFoundException("Position with id " + candidate.getPositionId() + " not found");
         }
         if (candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())){

@@ -39,7 +39,7 @@ class CandidateServiceTest {
 
     @BeforeEach
     void setUp() {
-        candidate = new Candidate("1", "John Doe", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null, null);
+        candidate = new Candidate("1", "John Doe", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null, "1");
     }
 
     @AfterEach
@@ -49,20 +49,33 @@ class CandidateServiceTest {
 
     @Test
     void shouldAddCandidate(){
+        Position position = Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("Software Engineer").build();
+        when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(position);
+        when(positionsService.getPositionByName(position.getName())).thenReturn(position);
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
         when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(false);
-        when(candidateRepository.save(candidate)).thenReturn(candidate);
-        when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("").build());
+        when(candidateRepository.save(any(Candidate.class))).thenReturn(candidate);
 
         Candidate addedCandidate = candidateService.addCandidate(candidate);
-        assertNotNull(addedCandidate);
 
+        assertNotNull(addedCandidate);
         verify(candidateRepository).save(candidate);
     }
 
     @Test
+    void addCandidateShouldThrowExceptionWhenPositionNameNotFound(){
+        Position position = Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("Software Engineer").build();
+        when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(position);
+        when(positionsService.getPositionByName(position.getName())).thenReturn(null);
+
+        assertThrows(PositionNotFoundException.class, () -> candidateService.addCandidate(candidate));
+    }
+
+    @Test
     void addCandidateShouldThrowExceptionWhenCandidateWithPhoneNumberAlreadyExist(){
-        when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("").build());
+        Position position = Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("Software Engineer").build();
+        when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(position);
+        when(positionsService.getPositionByName(position.getName())).thenReturn(position);
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(true);
 
         assertThrows(DuplicateCandidateException.class, () -> candidateService.addCandidate(candidate));
@@ -70,20 +83,13 @@ class CandidateServiceTest {
 
     @Test
     void addCandidateShouldThrowExceptionWhenCandidateWithEmailAlreadyExist(){
-        when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("").build());
+        Position position = Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("Software Engineer").build();
+        when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(position);
+        when(positionsService.getPositionByName(position.getName())).thenReturn(position);
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
         when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(true);
 
         assertThrows(DuplicateCandidateException.class, () -> candidateService.addCandidate(candidate));
-    }
-
-    @Test
-    void addCandidateShouldThrowExceptionWhenPositionNotFound(){
-        lenient().when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
-        lenient().when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(false);
-        lenient().when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(null);
-
-        assertThrows(PositionNotFoundException.class, () -> candidateService.addCandidate(candidate));
     }
 
     @Test
