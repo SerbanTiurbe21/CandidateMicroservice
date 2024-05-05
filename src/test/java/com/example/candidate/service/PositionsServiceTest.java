@@ -4,6 +4,7 @@ import com.example.candidate.exception.PositionAlreadyExistsException;
 import com.example.candidate.exception.PositionNotFoundException;
 import com.example.candidate.model.Position;
 import com.example.candidate.model.Status;
+import com.example.candidate.model.SubStatus;
 import com.example.candidate.repository.PositionsRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,7 @@ class PositionsServiceTest {
 
     @BeforeEach
     void setUp() {
-        position = new Position("1", "Project Manager", Status.OPEN);
+        position = new Position("1", "Project Manager", Status.OPEN, null);
     }
 
     @AfterEach
@@ -106,7 +107,7 @@ class PositionsServiceTest {
 
     @Test
     void shouldUpdatePosition(){
-        Position updatedPosition = new Position("1", "Software Developer", Status.OPEN);
+        Position updatedPosition = new Position("1", "Software Developer", Status.OPEN, null);
         when(positionsRepository.findById(position.getId())).thenReturn(Optional.of(position));
         when(positionsRepository.save(position)).thenReturn(updatedPosition);
 
@@ -118,26 +119,46 @@ class PositionsServiceTest {
 
     @Test
     void updatePositionShouldThrowExceptionWhenPositionNotFound(){
-        Position updatedPosition = new Position("1", "Software Developer", Status.OPEN);
+        Position updatedPosition = new Position("1", "Software Developer", Status.OPEN, null);
         when(positionsRepository.findById(position.getId())).thenReturn(Optional.empty());
 
         assertThrows(PositionNotFoundException.class, () -> positionsService.updatePosition(position.getId(), updatedPosition));
     }
 
     @Test
-    void shouldDeletePosition(){
-        positionsService.deletePosition(position.getId());
-        verify(positionsRepository).deleteById(position.getId());
+    void shouldDeactivatePosition(){
+        when(positionsRepository.findById(position.getId())).thenReturn(Optional.of(position));
+
+        positionsService.deactivatePosition(position.getId(), SubStatus.CANCELLED);
+        verify(positionsRepository).save(position);
+    }
+
+    @Test
+    void deactivatePositionShouldThrowExceptionWhenPositionNotFound(){
+        when(positionsRepository.findById(position.getId())).thenReturn(Optional.empty());
+
+        assertThrows(PositionNotFoundException.class, () -> positionsService.deactivatePosition(position.getId(), SubStatus.CANCELLED));
     }
 
     @Test
     void shouldGetPositionsByStatus(){
         when(positionsRepository.findPositionsByStatus(Status.OPEN)).thenReturn(Collections.singletonList(position));
 
-        List<Position> positionsByStatus = positionsService.getPositionsByStatus(String.valueOf(Status.valueOf("OPEN")));
+        List<Position> positionsByStatus = positionsService.getPositionsByStatus(Status.OPEN);
         assertFalse(positionsByStatus.isEmpty());
         assertNotNull(positionsByStatus);
 
         verify(positionsRepository).findPositionsByStatus(Status.OPEN);
+    }
+
+    @Test
+    void shouldGetPositionsByStatusAndSubStatus(){
+        when(positionsRepository.findPositionsByStatusAndSubStatus(Status.OPEN, SubStatus.CANCELLED)).thenReturn(Collections.singletonList(position));
+
+        List<Position> positionsByStatusAndSubStatus = positionsService.getPositionsByStatusAndSubStatus(Status.OPEN, SubStatus.CANCELLED);
+        assertFalse(positionsByStatusAndSubStatus.isEmpty());
+        assertNotNull(positionsByStatusAndSubStatus);
+
+        verify(positionsRepository).findPositionsByStatusAndSubStatus(Status.OPEN, SubStatus.CANCELLED);
     }
 }

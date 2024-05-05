@@ -2,6 +2,7 @@ package com.example.candidate.controller;
 
 import com.example.candidate.model.Position;
 import com.example.candidate.model.Status;
+import com.example.candidate.model.SubStatus;
 import com.example.candidate.service.PositionsService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,7 @@ class PositionsControllerTest {
 
     @BeforeEach
     void setUp() {
-        position = new Position("1", "Project Manager", Status.OPEN);
+        position = new Position("1", "Project Manager", Status.OPEN, null);
     }
 
     @AfterEach
@@ -87,22 +88,36 @@ class PositionsControllerTest {
     }
 
     @Test
-    void shouldDeletePosition() {
-        positionsController.deletePosition("1").block();
+    void shouldDeactivatePosition() {
+        ResponseEntity<Void> response = positionsController.deactivatePosition("1", SubStatus.FILLED).block();
 
-        verify(positionsService).deletePosition("1");
+        assert response != null;
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(positionsService).deactivatePosition("1", SubStatus.FILLED);
     }
 
     @Test
     void shouldGetPositionsByStatus() {
-        when(positionsService.getPositionsByStatus(String.valueOf(Status.OPEN))).thenReturn(List.of(position));
+        when(positionsService.getPositionsByStatus(Status.OPEN)).thenReturn(List.of(position));
 
-        ResponseEntity<List<Position>> response = positionsController.getPositionsByStatus(String.valueOf(Status.OPEN)).block();
+        ResponseEntity<List<Position>> response = positionsController.getPositionsByStatus(Status.OPEN).block();
 
         assert response != null;
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(List.of(position), response.getBody());
-        verify(positionsService).getPositionsByStatus(String.valueOf(Status.OPEN));
+        verify(positionsService).getPositionsByStatus(Status.OPEN);
+    }
+
+    @Test
+    void shouldGetPositionsByStatusAndSubStatus() {
+        when(positionsService.getPositionsByStatusAndSubStatus(Status.OPEN, SubStatus.FILLED)).thenReturn(List.of(position));
+
+        ResponseEntity<List<Position>> response = positionsController.getPositionsByStatusAndSubStatus(Status.OPEN, SubStatus.FILLED).block();
+
+        assert response != null;
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(List.of(position), response.getBody());
+        verify(positionsService).getPositionsByStatusAndSubStatus(Status.OPEN, SubStatus.FILLED);
     }
 
 }

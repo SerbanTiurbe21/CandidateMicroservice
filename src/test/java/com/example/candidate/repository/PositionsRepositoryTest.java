@@ -23,8 +23,8 @@ class PositionsRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        position = new Position("1", "Project Manager", Status.OPEN);
-        position1 = new Position("2", "Developer", Status.OPEN);
+        position = new Position("1", "Project Manager", Status.OPEN, null);
+        position1 = new Position("2", "Developer", Status.OPEN, null);
         positionsRepository.saveAll(List.of(position, position1));
     }
 
@@ -51,6 +51,13 @@ class PositionsRepositoryTest {
     @Test
     void shouldReturnListOfPositionsByStatus() {
         List<Position> positions = positionsRepository.findPositionsByStatus(Status.OPEN);
+        assertTrue(positions.contains(position));
+        assertTrue(positions.contains(position1));
+    }
+
+    @Test
+    void shouldReturnListOfPositionsByStatusAndSubStatus() {
+        List<Position> positions = positionsRepository.findPositionsByStatusAndSubStatus(Status.OPEN, null);
         assertTrue(positions.contains(position));
         assertTrue(positions.contains(position1));
     }

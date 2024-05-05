@@ -1,6 +1,8 @@
 package com.example.candidate.controller;
 
 import com.example.candidate.model.Position;
+import com.example.candidate.model.Status;
+import com.example.candidate.model.SubStatus;
 import com.example.candidate.service.PositionsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -68,16 +70,16 @@ public class PositionsController {
         return Mono.just(ResponseEntity.ok(updatedPosition));
     }
 
-    @Operation(summary = "Delete a position", description = "Deletes a position by its ID")
+    @Operation(summary = "Deactivate a position", description = "Deactivates a position by setting its status to INACTIVE")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Position deleted successfully"),
+            @ApiResponse(responseCode = "200", description = "Position deactivated successfully"),
             @ApiResponse(responseCode = "404", description = "Position not found")
     })
-    @DeleteMapping("/{id}")
+    @PutMapping("/{id}/deactivate")
     @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
-    public Mono<ResponseEntity<Void>> deletePosition(@PathVariable String id) {
-        positionsService.deletePosition(id);
-        return Mono.just(ResponseEntity.noContent().build());
+    public Mono<ResponseEntity<Void>> deactivatePosition(@PathVariable String id, @RequestParam SubStatus reason) {
+        positionsService.deactivatePosition(id, reason);
+        return Mono.just(ResponseEntity.ok().build());
     }
 
     @Operation(summary = "Get positions by status", description = "Retrieves positions by their status")
@@ -87,7 +89,19 @@ public class PositionsController {
     })
     @GetMapping(params = "status")
     @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
-    public Mono<ResponseEntity<List<Position>>> getPositionsByStatus(@RequestParam String status) {
+    public Mono<ResponseEntity<List<Position>>> getPositionsByStatus(@RequestParam Status status) {
         return Mono.just(ResponseEntity.ok(positionsService.getPositionsByStatus(status)));
     }
+
+    @Operation(summary = "Get positions by sub-status", description = "Retrieves positions by their sub-status")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Positions retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No positions found")
+    })
+    @GetMapping("/sub-status")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
+    public Mono<ResponseEntity<List<Position>>> getPositionsByStatusAndSubStatus(@RequestParam Status status, @RequestParam SubStatus subStatus) {
+        return Mono.just(ResponseEntity.ok(positionsService.getPositionsByStatusAndSubStatus(status, subStatus)));
+    }
+
 }
