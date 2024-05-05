@@ -34,13 +34,15 @@ public class PositionsServiceImpl implements PositionsService{
 
     @Override
     public Position addPosition(Position position) {
-        Optional<Position> positionOptional = positionsRepository.findByName(position.getName());
-        if(positionOptional.isPresent() && (!positionOptional.get().getStatus().equals(Status.CLOSED))){
-            throw new PositionAlreadyExistsException("Position with name " + position.getName() + " already exists but is not closed");
+        Optional<Position> existingPositionOptional = positionsRepository.findByName(position.getName());
+
+        if (existingPositionOptional.isPresent()) {
+            Position existingPosition = existingPositionOptional.get();
+            if (!existingPosition.getStatus().equals(Status.CLOSED)) {
+                throw new PositionAlreadyExistsException("Position with name " + position.getName() + " already exists and is not closed");
+            }
         }
-        if(positionsRepository.existsByName(position.getName())){
-            throw new PositionAlreadyExistsException("Position with name " + position.getName() + " already exists");
-        }
+
         position.setStatus(Status.OPEN);
         position.setSubStatus(null);
         return positionsRepository.save(position);

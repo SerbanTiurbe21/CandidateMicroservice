@@ -18,11 +18,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 class PositionsServiceTest {
@@ -31,11 +35,14 @@ class PositionsServiceTest {
     @InjectMocks
     private PositionsServiceImpl positionsService;
     private Position position;
+    private Position closedPosition;
 
     @BeforeEach
     void setUp() {
         position = new Position("1", "Project Manager", Status.OPEN, null);
+        closedPosition = new Position("1", "Developer", Status.CLOSED, null);
     }
+
 
     @AfterEach
     void tearDown() {
@@ -88,26 +95,46 @@ class PositionsServiceTest {
     }
 
     @Test
-    void shouldAddPosition(){
-        when(positionsRepository.existsByName(position.getName())).thenReturn(false);
-        when(positionsRepository.save(position)).thenReturn(position);
+    void shouldAddPositionWhenNotExisting() {
+        when(positionsRepository.findByName("Developer")).thenReturn(Optional.empty());
+        when(positionsRepository.save(any(Position.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Position addedPosition = positionsService.addPosition(position);
-        assertNotNull(addedPosition);
+        Position newPosition = new Position("1", "Developer", Status.OPEN, null);
+        Position savedPosition = positionsService.addPosition(newPosition);
 
-        verify(positionsRepository).save(position);
+        assertNotNull(savedPosition);
+        assertEquals(Status.OPEN, savedPosition.getStatus());
+        assertNull(savedPosition.getSubStatus());
+        verify(positionsRepository).save(newPosition);
     }
 
     @Test
-    void addPositionShouldThrowExceptionWhenPositionAlreadyExists(){
-        when(positionsRepository.existsByName(position.getName())).thenReturn(true);
+    void shouldThrowExceptionWhenPositionExistsAndNotClosed() {
+        when(positionsRepository.findByName("Developer")).thenReturn(Optional.of(position));
 
-        assertThrows(PositionAlreadyExistsException.class, () -> positionsService.addPosition(position));
+        Position newPosition = new Position("1", "Developer", Status.OPEN, null);
+
+        assertThrows(PositionAlreadyExistsException.class, () -> positionsService.addPosition(newPosition));
+        verify(positionsRepository, never()).save(any(Position.class));
+    }
+
+    @Test
+    void shouldAddPositionWhenExistingPositionIsClosed() {
+        when(positionsRepository.findByName("Developer")).thenReturn(Optional.of(closedPosition));
+        when(positionsRepository.save(any(Position.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Position newPosition = new Position("1", "Developer", Status.OPEN, null);
+        Position savedPosition = positionsService.addPosition(newPosition);
+
+        assertNotNull(savedPosition);
+        assertEquals(Status.OPEN, savedPosition.getStatus());
+        assertNull(savedPosition.getSubStatus());
+        verify(positionsRepository).save(newPosition);
     }
 
     @Test
     void shouldUpdatePosition(){
-        Position updatedPosition = new Position("1", "Software Developer", Status.OPEN, null);
+        Position updatedPosition = new Position("1", "Software Developer", Status.CLOSED, SubStatus.CANCELLED);
         when(positionsRepository.findById(position.getId())).thenReturn(Optional.of(position));
         when(positionsRepository.save(position)).thenReturn(updatedPosition);
 
