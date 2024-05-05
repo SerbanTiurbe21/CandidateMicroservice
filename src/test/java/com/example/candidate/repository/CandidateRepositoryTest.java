@@ -67,4 +67,10 @@ class CandidateRepositoryTest {
         List<Candidate> candidates = candidateRepository.findCandidatesByPositionId("1");
         assertThat(candidates).isEmpty();
     }
+
+    @Test
+    void shouldCountCandidatesByPositionId() {
+        int count = candidateRepository.countCandidatesByPositionId("1");
+        assertThat(count).isZero();
+    }
 }

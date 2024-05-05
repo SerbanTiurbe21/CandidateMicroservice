@@ -24,4 +24,13 @@ public class PositionExceptionHandler {
         );
         return new ResponseEntity<>(positionException, positionException.getHttpStatus());
     }
+
+    @ExceptionHandler(value = {DeactivationNotAllowedException.class})
+    public ResponseEntity<Object> handleDeactivationNotAllowedException(DeactivationNotAllowedException deactivationNotAllowedException) {
+        PositionException positionException = new PositionException(
+                deactivationNotAllowedException.getMessage(),
+                HttpStatus.BAD_REQUEST
+        );
+        return new ResponseEntity<>(positionException, positionException.getHttpStatus());
+    }
 }

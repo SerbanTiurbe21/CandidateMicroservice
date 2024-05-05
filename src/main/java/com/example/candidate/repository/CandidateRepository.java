@@ -16,4 +16,5 @@ public interface CandidateRepository extends MongoRepository<Candidate, String> 
     @NonNull List<Candidate> findAll(@NonNull Sort sort);
     List<Candidate> findCandidatesByAssignedTo(String assignedToId);
     List<Candidate> findCandidatesByPositionId(String positionId);
+    int countCandidatesByPositionId(String positionId);
 }

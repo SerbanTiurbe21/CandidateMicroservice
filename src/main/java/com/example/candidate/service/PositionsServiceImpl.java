@@ -1,10 +1,12 @@
 package com.example.candidate.service;
 
+import com.example.candidate.exception.DeactivationNotAllowedException;
 import com.example.candidate.exception.PositionAlreadyExistsException;
 import com.example.candidate.exception.PositionNotFoundException;
 import com.example.candidate.model.Position;
 import com.example.candidate.model.Status;
 import com.example.candidate.model.SubStatus;
+import com.example.candidate.repository.CandidateRepository;
 import com.example.candidate.repository.PositionsRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PositionsServiceImpl implements PositionsService{
     private final PositionsRepository positionsRepository;
+    private final CandidateRepository candidateRepository;
     @Override
     public List<Position> getAllPositions() {
         return positionsRepository.findAll();
@@ -61,6 +64,9 @@ public class PositionsServiceImpl implements PositionsService{
 
     @Override
     public void deactivatePosition(String id, SubStatus reason) {
+        if (candidateRepository.countCandidatesByPositionId(id) > 0) {
+            throw new DeactivationNotAllowedException("Cannot deactivate position as there are active candidates linked to it.");
+        }
         Position position = positionsRepository.findById(id).orElseThrow(() -> new PositionNotFoundException("Position with id " + id + " not found"));
         position.setStatus(Status.CLOSED);
         position.setSubStatus(reason);

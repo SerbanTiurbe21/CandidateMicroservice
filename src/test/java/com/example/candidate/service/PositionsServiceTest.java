@@ -1,10 +1,12 @@
 package com.example.candidate.service;
 
+import com.example.candidate.exception.DeactivationNotAllowedException;
 import com.example.candidate.exception.PositionAlreadyExistsException;
 import com.example.candidate.exception.PositionNotFoundException;
 import com.example.candidate.model.Position;
 import com.example.candidate.model.Status;
 import com.example.candidate.model.SubStatus;
+import com.example.candidate.repository.CandidateRepository;
 import com.example.candidate.repository.PositionsRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,11 +29,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class PositionsServiceTest {
     @Mock
     private PositionsRepository positionsRepository;
+    @Mock
+    private CandidateRepository candidateRepository;
     @InjectMocks
     private PositionsServiceImpl positionsService;
     private Position position;
@@ -165,6 +170,14 @@ class PositionsServiceTest {
         when(positionsRepository.findById(position.getId())).thenReturn(Optional.empty());
 
         assertThrows(PositionNotFoundException.class, () -> positionsService.deactivatePosition(position.getId(), SubStatus.CANCELLED));
+    }
+
+    @Test
+    void deactivatePositionShouldThrowExceptionWhenCandidatesLinkedToPosition(){
+        lenient().when(positionsRepository.findById(position.getId())).thenReturn(Optional.of(position));
+        lenient().when(candidateRepository.countCandidatesByPositionId(position.getId())).thenReturn(1);
+
+        assertThrows(DeactivationNotAllowedException.class, () -> positionsService.deactivatePosition(position.getId(), SubStatus.CANCELLED));
     }
 
     @Test
