@@ -23,8 +23,8 @@ class PositionsRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        position = new Position("1", "Project Manager", Status.OPEN, null);
-        position1 = new Position("2", "Developer", Status.OPEN, null);
+        position = new Position("1", "Project Manager", Status.OPEN, null, null);
+        position1 = new Position("2", "Developer", Status.OPEN, null, null);
         positionsRepository.saveAll(List.of(position, position1));
     }
 

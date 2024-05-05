@@ -1,8 +1,7 @@
 package com.example.candidate.service;
 
-import com.example.candidate.exception.DeactivationNotAllowedException;
-import com.example.candidate.exception.PositionAlreadyExistsException;
-import com.example.candidate.exception.PositionNotFoundException;
+import com.example.candidate.exception.*;
+import com.example.candidate.model.Candidate;
 import com.example.candidate.model.Position;
 import com.example.candidate.model.Status;
 import com.example.candidate.model.SubStatus;
@@ -29,7 +28,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class PositionsServiceTest {
@@ -41,17 +39,19 @@ class PositionsServiceTest {
     private PositionsServiceImpl positionsService;
     private Position position;
     private Position closedPosition;
+    private String candidateId = "candidate123";
 
     @BeforeEach
     void setUp() {
-        position = new Position("1", "Project Manager", Status.OPEN, null);
-        closedPosition = new Position("1", "Developer", Status.CLOSED, null);
+        position = new Position("1", "Project Manager", Status.OPEN, null, null);
+        closedPosition = new Position("1", "Developer", Status.CLOSED, SubStatus.CANCELLED, null);
     }
 
 
     @AfterEach
     void tearDown() {
         position = null;
+        closedPosition = null;
     }
 
     @Test
@@ -104,7 +104,7 @@ class PositionsServiceTest {
         when(positionsRepository.findByName("Developer")).thenReturn(Optional.empty());
         when(positionsRepository.save(any(Position.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Position newPosition = new Position("1", "Developer", Status.OPEN, null);
+        Position newPosition = new Position("1", "Developer", Status.OPEN, null, null);
         Position savedPosition = positionsService.addPosition(newPosition);
 
         assertNotNull(savedPosition);
@@ -117,7 +117,7 @@ class PositionsServiceTest {
     void shouldThrowExceptionWhenPositionExistsAndNotClosed() {
         when(positionsRepository.findByName("Developer")).thenReturn(Optional.of(position));
 
-        Position newPosition = new Position("1", "Developer", Status.OPEN, null);
+        Position newPosition = new Position("1", "Developer", Status.OPEN, null, null);
 
         assertThrows(PositionAlreadyExistsException.class, () -> positionsService.addPosition(newPosition));
         verify(positionsRepository, never()).save(any(Position.class));
@@ -128,7 +128,7 @@ class PositionsServiceTest {
         when(positionsRepository.findByName("Developer")).thenReturn(Optional.of(closedPosition));
         when(positionsRepository.save(any(Position.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Position newPosition = new Position("1", "Developer", Status.OPEN, null);
+        Position newPosition = new Position("1", "Developer", Status.OPEN, null, null);
         Position savedPosition = positionsService.addPosition(newPosition);
 
         assertNotNull(savedPosition);
@@ -139,7 +139,7 @@ class PositionsServiceTest {
 
     @Test
     void shouldUpdatePosition(){
-        Position updatedPosition = new Position("1", "Software Developer", Status.CLOSED, SubStatus.CANCELLED);
+        Position updatedPosition = new Position("1", "Software Developer", Status.CLOSED, SubStatus.CANCELLED, null);
         when(positionsRepository.findById(position.getId())).thenReturn(Optional.of(position));
         when(positionsRepository.save(position)).thenReturn(updatedPosition);
 
@@ -151,33 +151,10 @@ class PositionsServiceTest {
 
     @Test
     void updatePositionShouldThrowExceptionWhenPositionNotFound(){
-        Position updatedPosition = new Position("1", "Software Developer", Status.OPEN, null);
+        Position updatedPosition = new Position("1", "Software Developer", Status.OPEN, null, null);
         when(positionsRepository.findById(position.getId())).thenReturn(Optional.empty());
 
         assertThrows(PositionNotFoundException.class, () -> positionsService.updatePosition(position.getId(), updatedPosition));
-    }
-
-    @Test
-    void shouldDeactivatePosition(){
-        when(positionsRepository.findById(position.getId())).thenReturn(Optional.of(position));
-
-        positionsService.deactivatePosition(position.getId(), SubStatus.CANCELLED);
-        verify(positionsRepository).save(position);
-    }
-
-    @Test
-    void deactivatePositionShouldThrowExceptionWhenPositionNotFound(){
-        when(positionsRepository.findById(position.getId())).thenReturn(Optional.empty());
-
-        assertThrows(PositionNotFoundException.class, () -> positionsService.deactivatePosition(position.getId(), SubStatus.CANCELLED));
-    }
-
-    @Test
-    void deactivatePositionShouldThrowExceptionWhenCandidatesLinkedToPosition(){
-        lenient().when(positionsRepository.findById(position.getId())).thenReturn(Optional.of(position));
-        lenient().when(candidateRepository.countCandidatesByPositionId(position.getId())).thenReturn(1);
-
-        assertThrows(DeactivationNotAllowedException.class, () -> positionsService.deactivatePosition(position.getId(), SubStatus.CANCELLED));
     }
 
     @Test
@@ -200,5 +177,81 @@ class PositionsServiceTest {
         assertNotNull(positionsByStatusAndSubStatus);
 
         verify(positionsRepository).findPositionsByStatusAndSubStatus(Status.OPEN, SubStatus.CANCELLED);
+    }
+
+    @Test
+    void cancelPositionShouldThrowNotFoundException() {
+        when(positionsRepository.findById("1")).thenReturn(Optional.empty());
+        assertThrows(PositionNotFoundException.class,
+                () -> positionsService.cancelPosition("1"));
+    }
+
+    @Test
+    void cancelPositionShouldThrowAlreadyDeactivatedException() {
+        when(positionsRepository.findById("1")).thenReturn(Optional.of(closedPosition));
+        assertThrows(PositionAlreadyDeactivatedException.class,
+                () -> positionsService.cancelPosition("1"));
+    }
+
+    @Test
+    void cancelPositionShouldThrowDeactivationNotAllowedException() {
+        when(positionsRepository.findById("1")).thenReturn(Optional.of(position));
+        when(candidateRepository.countCandidatesByPositionId("1")).thenReturn(1);
+        assertThrows(DeactivationNotAllowedException.class,
+                () -> positionsService.cancelPosition("1"));
+    }
+
+    @Test
+    void shouldCancelPositionSuccessfully() {
+        when(positionsRepository.findById("1")).thenReturn(Optional.of(position));
+        when(candidateRepository.countCandidatesByPositionId("1")).thenReturn(0);
+        positionsService.cancelPosition("1");
+        assertEquals(Status.CLOSED, position.getStatus());
+        assertEquals(SubStatus.CANCELLED, position.getSubStatus());
+        verify(positionsRepository).save(position);
+    }
+
+    @Test
+    void fillPositionShouldThrowNotFoundException() {
+        when(positionsRepository.findById("1")).thenReturn(Optional.empty());
+        assertThrows(PositionNotFoundException.class,
+                () -> positionsService.fillPosition("1", candidateId));
+    }
+
+    @Test
+    void fillPositionShouldThrowAlreadyDeactivatedException() {
+        when(positionsRepository.findById("1")).thenReturn(Optional.of(closedPosition));
+        assertThrows(PositionAlreadyDeactivatedException.class,
+                () -> positionsService.fillPosition("1", candidateId));
+    }
+
+    @Test
+    void fillPositionShouldThrowDeactivationNotAllowedExceptionForActiveCandidates() {
+        when(positionsRepository.findById("1")).thenReturn(Optional.of(position));
+        when(candidateRepository.countCandidatesByPositionId("1")).thenReturn(1);
+        assertThrows(DeactivationNotAllowedException.class,
+                () -> positionsService.fillPosition("1", candidateId));
+    }
+
+    @Test
+    void fillPositionShouldThrowCandidateNotFoundException() {
+        when(positionsRepository.findById("1")).thenReturn(Optional.of(position));
+        when(candidateRepository.countCandidatesByPositionId("1")).thenReturn(0);
+        when(candidateRepository.findById(candidateId)).thenReturn(Optional.empty());
+        assertThrows(CandidateNotFoundException.class,
+                () -> positionsService.fillPosition("1", candidateId));
+    }
+
+    @Test
+    void shouldFillPositionSuccessfully() {
+        when(positionsRepository.findById("1")).thenReturn(Optional.of(position));
+        when(candidateRepository.countCandidatesByPositionId("1")).thenReturn(0);
+        when(candidateRepository.findById(candidateId)).thenReturn(Optional.of(new Candidate(candidateId, "John Doe", "","","", null,null,null, null)));
+
+        positionsService.fillPosition("1", candidateId);
+        assertEquals(Status.CLOSED, position.getStatus());
+        assertEquals(SubStatus.FILLED, position.getSubStatus());
+        assertEquals(candidateId, position.getHiredCandidateId());
+        verify(positionsRepository).save(position);
     }
 }

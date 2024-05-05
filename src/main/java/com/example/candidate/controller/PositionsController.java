@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -70,18 +71,6 @@ public class PositionsController {
         return Mono.just(ResponseEntity.ok(updatedPosition));
     }
 
-    @Operation(summary = "Deactivate a position", description = "Deactivates a position by setting its status to INACTIVE")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Position deactivated successfully"),
-            @ApiResponse(responseCode = "404", description = "Position not found")
-    })
-    @PutMapping("/{id}/deactivate")
-    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
-    public Mono<ResponseEntity<Void>> deactivatePosition(@PathVariable String id, @RequestParam SubStatus reason) {
-        positionsService.deactivatePosition(id, reason);
-        return Mono.just(ResponseEntity.ok().build());
-    }
-
     @Operation(summary = "Get positions by status", description = "Retrieves positions by their status")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Positions retrieved successfully"),
@@ -104,4 +93,27 @@ public class PositionsController {
         return Mono.just(ResponseEntity.ok(positionsService.getPositionsByStatusAndSubStatus(status, subStatus)));
     }
 
+    @Operation(summary = "Cancel a position", description = "Cancels a position by its ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Position cancelled successfully"),
+            @ApiResponse(responseCode = "404", description = "Position not found")
+    })
+    @PutMapping("/{id}/cancel")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
+    public Mono<ResponseEntity<Void>> cancelPosition(@PathVariable String id) {
+        positionsService.cancelPosition(id);
+        return Mono.just(ResponseEntity.ok().build());
+    }
+
+    @Operation(summary = "Fill a position", description = "Fills a position with a hired candidate")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Position filled successfully"),
+            @ApiResponse(responseCode = "404", description = "Position not found")
+    })
+    @PutMapping("/{id}/fill")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
+    public Mono<ResponseEntity<Void>> fillPosition(@PathVariable String id, @RequestParam String hiredCandidateId) {
+        positionsService.fillPosition(id, hiredCandidateId);
+        return Mono.just(ResponseEntity.ok().build());
+    }
 }

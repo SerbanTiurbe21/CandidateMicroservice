@@ -33,4 +33,13 @@ public class PositionExceptionHandler {
         );
         return new ResponseEntity<>(positionException, positionException.getHttpStatus());
     }
+
+    @ExceptionHandler(value = {PositionAlreadyDeactivatedException.class})
+    public ResponseEntity<Object> handlePositionAlreadyDeactivatedException(PositionAlreadyDeactivatedException positionAlreadyDeactivatedException) {
+        PositionException positionException = new PositionException(
+                positionAlreadyDeactivatedException.getMessage(),
+                HttpStatus.BAD_REQUEST
+        );
+        return new ResponseEntity<>(positionException, positionException.getHttpStatus());
+    }
 }

@@ -17,4 +17,5 @@ public class Position {
     @NonNull
     private Status status;
     private SubStatus subStatus;
+    private String hiredCandidateId;
 }

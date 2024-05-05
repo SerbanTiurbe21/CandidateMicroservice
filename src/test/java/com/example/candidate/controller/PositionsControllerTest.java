@@ -18,8 +18,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PositionsControllerTest {
@@ -31,7 +30,7 @@ class PositionsControllerTest {
 
     @BeforeEach
     void setUp() {
-        position = new Position("1", "Project Manager", Status.OPEN, null);
+        position = new Position("1", "Project Manager", Status.OPEN, null, null);
     }
 
     @AfterEach
@@ -88,15 +87,6 @@ class PositionsControllerTest {
     }
 
     @Test
-    void shouldDeactivatePosition() {
-        ResponseEntity<Void> response = positionsController.deactivatePosition("1", SubStatus.FILLED).block();
-
-        assert response != null;
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(positionsService).deactivatePosition("1", SubStatus.FILLED);
-    }
-
-    @Test
     void shouldGetPositionsByStatus() {
         when(positionsService.getPositionsByStatus(Status.OPEN)).thenReturn(List.of(position));
 
@@ -118,6 +108,28 @@ class PositionsControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(List.of(position), response.getBody());
         verify(positionsService).getPositionsByStatusAndSubStatus(Status.OPEN, SubStatus.FILLED);
+    }
+
+    @Test
+    void shouldCancelPosition() {
+        doNothing().when(positionsService).cancelPosition("1");
+
+        ResponseEntity<Void> response = positionsController.cancelPosition("1").block();
+
+        assert response != null;
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(positionsService).cancelPosition("1");
+    }
+
+    @Test
+    void shouldFillPosition() {
+        doNothing().when(positionsService).fillPosition("1", "2");
+
+        ResponseEntity<Void> response = positionsController.fillPosition("1", "2").block();
+
+        assert response != null;
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(positionsService).fillPosition("1", "2");
     }
 
 }

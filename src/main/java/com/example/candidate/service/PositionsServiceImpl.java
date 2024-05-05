@@ -1,8 +1,6 @@
 package com.example.candidate.service;
 
-import com.example.candidate.exception.DeactivationNotAllowedException;
-import com.example.candidate.exception.PositionAlreadyExistsException;
-import com.example.candidate.exception.PositionNotFoundException;
+import com.example.candidate.exception.*;
 import com.example.candidate.model.Position;
 import com.example.candidate.model.Status;
 import com.example.candidate.model.SubStatus;
@@ -63,13 +61,30 @@ public class PositionsServiceImpl implements PositionsService{
     }
 
     @Override
-    public void deactivatePosition(String id, SubStatus reason) {
-        if (candidateRepository.countCandidatesByPositionId(id) > 0) {
-            throw new DeactivationNotAllowedException("Cannot deactivate position as there are active candidates linked to it.");
-        }
-        Position position = positionsRepository.findById(id).orElseThrow(() -> new PositionNotFoundException("Position with id " + id + " not found"));
+    public void cancelPosition(String id) {
+        Position position = positionsRepository.findById(id)
+                .orElseThrow(() -> new PositionNotFoundException("Position with id " + id + " not found"));
+
+        ensurePositionIsOpen(position);
+        ensureNoActiveCandidates(id);
+
         position.setStatus(Status.CLOSED);
-        position.setSubStatus(reason);
+        position.setSubStatus(SubStatus.CANCELLED);
+        positionsRepository.save(position);
+    }
+
+    @Override
+    public void fillPosition(String id, String hiredCandidateId) {
+        Position position = positionsRepository.findById(id)
+                .orElseThrow(() -> new PositionNotFoundException("Position with id " + id + " not found"));
+
+        ensurePositionIsOpen(position);
+        ensureNoActiveCandidates(id);
+        ensureCandidateExists(hiredCandidateId);
+
+        position.setStatus(Status.CLOSED);
+        position.setSubStatus(SubStatus.FILLED);
+        position.setHiredCandidateId(hiredCandidateId);
         positionsRepository.save(position);
     }
 
@@ -81,5 +96,23 @@ public class PositionsServiceImpl implements PositionsService{
     @Override
     public List<Position> getPositionsByStatusAndSubStatus(@NonNull Status status, SubStatus subStatus) {
         return positionsRepository.findPositionsByStatusAndSubStatus(status, subStatus);
+    }
+
+    private void ensurePositionIsOpen(Position position) {
+        if (position.getStatus() == Status.CLOSED) {
+            throw new PositionAlreadyDeactivatedException("This position is already closed.");
+        }
+    }
+
+    private void ensureNoActiveCandidates(String positionId) {
+        if (candidateRepository.countCandidatesByPositionId(positionId) > 0) {
+            throw new DeactivationNotAllowedException("Cannot modify position since there are active candidates linked to it.");
+        }
+    }
+
+    private void ensureCandidateExists(String candidateId) {
+        if (candidateRepository.findById(candidateId).isEmpty()) {
+            throw new CandidateNotFoundException("Candidate with id " + candidateId + " not found");
+        }
     }
 }
