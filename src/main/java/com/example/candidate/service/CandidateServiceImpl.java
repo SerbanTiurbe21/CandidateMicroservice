@@ -23,7 +23,7 @@ public class CandidateServiceImpl implements CandidateService {
         Position position = positionsService.getPositionById(candidate.getPositionId());
         String positionName = position.getName();
         if (positionsService.getPositionsByName(positionName).isEmpty()) {
-            throw new PositionNotFoundException("Position with id " + candidate.getPositionId() + " not found");
+            throw new PositionNotFoundException("Position with name " + candidate.getName()+ " not found");
         }
         if (candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())){
             throw new DuplicateCandidateException("Candidate with this phone number already exist");
