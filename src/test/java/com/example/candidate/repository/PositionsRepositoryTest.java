@@ -61,4 +61,10 @@ class PositionsRepositoryTest {
         assertTrue(positions.contains(position));
         assertTrue(positions.contains(position1));
     }
+
+    @Test
+    void shouldReturnListOfPositionsByName() {
+        List<Position> positions = positionsRepository.findPositionsByName("Developer");
+        assertTrue(positions.contains(position1));
+    }
 }

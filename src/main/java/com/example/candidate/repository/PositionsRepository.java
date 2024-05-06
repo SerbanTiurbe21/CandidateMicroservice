@@ -16,4 +16,5 @@ public interface PositionsRepository extends MongoRepository<Position, String> {
     Optional<Position> findByName(String name);
     List<Position> findPositionsByStatus(Status status);
     List<Position> findPositionsByStatusAndSubStatus(@NonNull Status status, SubStatus subStatus);
+    List<Position> findPositionsByName(String name);
 }

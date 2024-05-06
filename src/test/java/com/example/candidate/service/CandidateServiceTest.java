@@ -51,7 +51,7 @@ class CandidateServiceTest {
     void shouldAddCandidate(){
         Position position = Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("Software Engineer").build();
         when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(position);
-        when(positionsService.getPositionByName(position.getName())).thenReturn(position);
+        when(positionsService.getPositionsByName(position.getName())).thenReturn(Collections.singletonList(position));
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
         when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(false);
         when(candidateRepository.save(any(Candidate.class))).thenReturn(candidate);
@@ -66,7 +66,7 @@ class CandidateServiceTest {
     void addCandidateShouldThrowExceptionWhenPositionNameNotFound(){
         Position position = Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("Software Engineer").build();
         when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(position);
-        when(positionsService.getPositionByName(position.getName())).thenReturn(null);
+        when(positionsService.getPositionsByName(position.getName())).thenReturn(Collections.emptyList());
 
         assertThrows(PositionNotFoundException.class, () -> candidateService.addCandidate(candidate));
     }
@@ -75,7 +75,7 @@ class CandidateServiceTest {
     void addCandidateShouldThrowExceptionWhenCandidateWithPhoneNumberAlreadyExist(){
         Position position = Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("Software Engineer").build();
         when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(position);
-        when(positionsService.getPositionByName(position.getName())).thenReturn(position);
+        when(positionsService.getPositionsByName(position.getName())).thenReturn(Collections.singletonList(position));
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(true);
 
         assertThrows(DuplicateCandidateException.class, () -> candidateService.addCandidate(candidate));
@@ -85,7 +85,7 @@ class CandidateServiceTest {
     void addCandidateShouldThrowExceptionWhenCandidateWithEmailAlreadyExist(){
         Position position = Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("Software Engineer").build();
         when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(position);
-        when(positionsService.getPositionByName(position.getName())).thenReturn(position);
+        when(positionsService.getPositionsByName(position.getName())).thenReturn(Collections.singletonList(position));
         when(candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())).thenReturn(false);
         when(candidateRepository.existsByEmail(candidate.getEmail())).thenReturn(true);
 

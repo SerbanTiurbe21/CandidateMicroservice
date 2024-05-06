@@ -22,7 +22,7 @@ public class CandidateServiceImpl implements CandidateService {
     public Candidate addCandidate(Candidate candidate) {
         Position position = positionsService.getPositionById(candidate.getPositionId());
         String positionName = position.getName();
-        if (positionsService.getPositionByName(positionName) == null) {
+        if (positionsService.getPositionsByName(positionName).isEmpty()) {
             throw new PositionNotFoundException("Position with id " + candidate.getPositionId() + " not found");
         }
         if (candidateRepository.existsByPhoneNumber(candidate.getPhoneNumber())){

@@ -29,8 +29,8 @@ public class PositionsServiceImpl implements PositionsService{
     }
 
     @Override
-    public Position getPositionByName(String name) {
-       return positionsRepository.findByName(name).orElseThrow(() -> new PositionNotFoundException("Position with name " + name + " not found"));
+    public List<Position> getPositionsByName(String name) {
+        return positionsRepository.findPositionsByName(name);
     }
 
     @Override

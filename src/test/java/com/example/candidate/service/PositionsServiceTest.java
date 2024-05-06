@@ -83,20 +83,14 @@ class PositionsServiceTest {
     }
 
     @Test
-    void shouldGetPositionByName(){
-        when(positionsRepository.findByName(position.getName())).thenReturn(Optional.of(position));
+    void shouldGetPositionsByName(){
+        when(positionsRepository.findPositionsByName(position.getName())).thenReturn(Collections.singletonList(position));
 
-        Position positionByName = positionsService.getPositionByName(position.getName());
-        assertNotNull(positionByName);
+        List<Position> positionsByName = positionsService.getPositionsByName(position.getName());
+        assertFalse(positionsByName.isEmpty());
+        assertNotNull(positionsByName);
 
-        verify(positionsRepository).findByName(position.getName());
-    }
-
-    @Test
-    void getPositionByNameShouldThrowExceptionWhenPositionNotFound(){
-        when(positionsRepository.findByName(position.getName())).thenReturn(Optional.empty());
-
-        assertThrows(PositionNotFoundException.class, () -> positionsService.getPositionByName(position.getName()));
+        verify(positionsRepository).findPositionsByName(position.getName());
     }
 
     @Test
