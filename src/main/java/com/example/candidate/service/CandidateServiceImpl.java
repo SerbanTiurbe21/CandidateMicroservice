@@ -85,4 +85,9 @@ public class CandidateServiceImpl implements CandidateService {
     public List<Candidate> getCandidatesByPositionId(String positionId) {
         return candidateRepository.findCandidatesByPositionId(positionId);
     }
+
+    @Override
+    public Candidate findCandidateByDocumentId(String documentId) {
+        return candidateRepository.findCandidateByDocumentId(documentId);
+    }
 }

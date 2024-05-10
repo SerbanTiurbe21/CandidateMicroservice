@@ -193,4 +193,14 @@ class CandidateServiceTest {
 
         verify(candidateRepository).findCandidatesByPositionId(candidate.getPositionId());
     }
+
+    @Test
+    void shouldFindCandidateByDocumentId(){
+        when(candidateRepository.findCandidateByDocumentId(candidate.getDocumentId())).thenReturn(candidate);
+
+        Candidate foundCandidate = candidateService.findCandidateByDocumentId(candidate.getDocumentId());
+        assertNotNull(foundCandidate);
+
+        verify(candidateRepository).findCandidateByDocumentId(candidate.getDocumentId());
+    }
 }

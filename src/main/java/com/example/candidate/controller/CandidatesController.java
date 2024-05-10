@@ -127,4 +127,17 @@ public class CandidatesController {
             @Parameter(description = "ID of the position to retrieve candidates") @PathVariable String positionId) {
         return Mono.just(ResponseEntity.ok(candidateService.getCandidatesByPositionId(positionId)));
     }
+
+    @Operation(summary = "Get a candidate by document ID", description = "Retrieves a candidate by their document ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Candidate retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Candidate not found")
+    })
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-developer') or hasRole('ROLE_client-admin')")
+    @GetMapping("/document/{documentId}")
+    public Mono<ResponseEntity<Candidate>> findCandidateByDocumentId(
+            @Parameter(description = "Document ID of the candidate to be retrieved") @PathVariable String documentId) {
+        Candidate candidate = candidateService.findCandidateByDocumentId(documentId);
+        return Mono.just(ResponseEntity.ok(candidate));
+    }
 }

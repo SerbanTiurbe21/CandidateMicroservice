@@ -13,4 +13,5 @@ public interface CandidateService {
     List<Candidate> findCandidatesByAssignedTo(String assignedToId);
     void deleteCandidate(String id);
     List<Candidate> getCandidatesByPositionId(String positionId);
+    Candidate findCandidateByDocumentId(String documentId);
 }

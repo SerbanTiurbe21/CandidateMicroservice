@@ -133,4 +133,16 @@ class CandidateControllerTest {
         assertEquals(List.of(candidate), response.getBody());
         verify(candidateService).getCandidatesByPositionId("1");
     }
+
+    @Test
+    void shouldFindCandidateByDocumentId() {
+        when(candidateService.findCandidateByDocumentId("1")).thenReturn(candidate);
+
+        ResponseEntity<Candidate> response = candidatesController.findCandidateByDocumentId("1").block();
+
+        assert response != null;
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(candidate, response.getBody());
+        verify(candidateService).findCandidateByDocumentId("1");
+    }
 }

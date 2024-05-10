@@ -73,4 +73,10 @@ class CandidateRepositoryTest {
         int count = candidateRepository.countCandidatesByPositionId("1");
         assertThat(count).isZero();
     }
+
+    @Test
+    void shouldFindCandidateByDocumentId() {
+        Candidate candidate = candidateRepository.findCandidateByDocumentId("1");
+        assertThat(candidate).isNull();
+    }
 }
