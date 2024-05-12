@@ -11,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class PositionsServiceImpl implements PositionsService{
@@ -35,12 +33,12 @@ public class PositionsServiceImpl implements PositionsService{
 
     @Override
     public Position addPosition(Position position) {
-        Optional<Position> existingPositionOptional = positionsRepository.findByName(position.getName());
-
-        if (existingPositionOptional.isPresent()) {
-            Position existingPosition = existingPositionOptional.get();
-            if (!existingPosition.getStatus().equals(Status.CLOSED)) {
-                throw new PositionAlreadyExistsException("Position with name " + position.getName() + " already exists and is not closed");
+        List<Position> existingPositions = positionsRepository.findPositionsByName(position.getName());
+        if (!existingPositions.isEmpty()) {
+            for (Position existingPosition : existingPositions) {
+                if (!existingPosition.getStatus().equals(Status.CLOSED)) {
+                    throw new PositionAlreadyExistsException("Position with name " + position.getName() + " already exists and is not closed");
+                }
             }
         }
 

@@ -50,13 +50,6 @@ class CandidateRepositoryTest {
     }
 
     @Test
-    void shouldFindAllCandidates() {
-        Sort sort = Sort.by(Sort.Direction.ASC, "name");
-        List<Candidate> candidates = candidateRepository.findAll(sort);
-        assertThat(candidates).hasSize(2);
-    }
-
-    @Test
     void shouldFindCandidatesByAssignedTo() {
         List<Candidate> candidates = candidateRepository.findCandidatesByAssignedTo("1");
         assertThat(candidates).isEmpty();

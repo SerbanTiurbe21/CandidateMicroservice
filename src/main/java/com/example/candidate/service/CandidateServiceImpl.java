@@ -100,6 +100,7 @@ public class CandidateServiceImpl implements CandidateService {
         Position position = positionsService.getPositionById(positionId);
 
         candidate.setHired(true);
+        candidate.setAssignedTo(null);
         position.setHiredCandidateId(candidateId);
         position.setStatus(Status.CLOSED);
         position.setSubStatus(SubStatus.FILLED);

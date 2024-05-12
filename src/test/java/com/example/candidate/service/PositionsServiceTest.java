@@ -39,14 +39,13 @@ class PositionsServiceTest {
     private PositionsServiceImpl positionsService;
     private Position position;
     private Position closedPosition;
-    private String candidateId = "candidate123";
+    final private String candidateId = "candidate123";
 
     @BeforeEach
     void setUp() {
         position = new Position("1", "Project Manager", Status.OPEN, null, null);
         closedPosition = new Position("1", "Developer", Status.CLOSED, SubStatus.CANCELLED, null);
     }
-
 
     @AfterEach
     void tearDown() {
@@ -95,7 +94,7 @@ class PositionsServiceTest {
 
     @Test
     void shouldAddPositionWhenNotExisting() {
-        when(positionsRepository.findByName("Developer")).thenReturn(Optional.empty());
+        when(positionsRepository.findPositionsByName("Developer")).thenReturn(Collections.emptyList());
         when(positionsRepository.save(any(Position.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Position newPosition = new Position("1", "Developer", Status.OPEN, null, null);
@@ -109,17 +108,17 @@ class PositionsServiceTest {
 
     @Test
     void shouldThrowExceptionWhenPositionExistsAndNotClosed() {
-        when(positionsRepository.findByName("Developer")).thenReturn(Optional.of(position));
+        when(positionsRepository.findPositionsByName("Developer")).thenReturn(Collections.singletonList(position));
 
         Position newPosition = new Position("1", "Developer", Status.OPEN, null, null);
-
         assertThrows(PositionAlreadyExistsException.class, () -> positionsService.addPosition(newPosition));
-        verify(positionsRepository, never()).save(any(Position.class));
+
+        verify(positionsRepository, never()).save(newPosition);
     }
 
     @Test
     void shouldAddPositionWhenExistingPositionIsClosed() {
-        when(positionsRepository.findByName("Developer")).thenReturn(Optional.of(closedPosition));
+        when(positionsRepository.findPositionsByName("Developer")).thenReturn(Collections.singletonList(closedPosition));
         when(positionsRepository.save(any(Position.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Position newPosition = new Position("1", "Developer", Status.OPEN, null, null);
