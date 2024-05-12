@@ -41,7 +41,7 @@ public class PositionsController {
             @ApiResponse(responseCode = "404", description = "Position not found")
     })
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin') or hasRole('ROLE_client-developer')")
     public Mono<ResponseEntity<Position>> getPositionById(@PathVariable String id) {
         return Mono.just(ResponseEntity.ok(positionsService.getPositionById(id)));
     }
