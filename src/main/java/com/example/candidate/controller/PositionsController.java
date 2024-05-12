@@ -30,7 +30,7 @@ public class PositionsController {
             @ApiResponse(responseCode = "200", description = "Positions retrieved successfully")
     })
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin') or hasRole('ROLE_client-developer')")
     public Mono<ResponseEntity<List<Position>>> getAllPositions() {
         return Mono.just(ResponseEntity.ok(positionsService.getAllPositions()));
     }
