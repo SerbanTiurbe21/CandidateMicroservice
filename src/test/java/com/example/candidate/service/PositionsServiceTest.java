@@ -248,4 +248,15 @@ class PositionsServiceTest {
         assertEquals(candidateId, position.getHiredCandidateId());
         verify(positionsRepository).save(position);
     }
+
+    @Test
+    void shouldGetPositionsByStatuses(){
+        when(positionsRepository.findPositionsByStatuses(Status.OPEN, Status.CLOSED)).thenReturn(Collections.singletonList(position));
+
+        List<Position> positionsByStatuses = positionsService.getPositionsByStatuses(Status.OPEN, Status.CLOSED);
+        assertFalse(positionsByStatuses.isEmpty());
+        assertNotNull(positionsByStatuses);
+
+        verify(positionsRepository).findPositionsByStatuses(Status.OPEN, Status.CLOSED);
+    }
 }

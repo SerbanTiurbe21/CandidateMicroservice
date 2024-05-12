@@ -116,4 +116,15 @@ public class PositionsController {
         positionsService.fillPosition(id, hiredCandidateId);
         return Mono.just(ResponseEntity.ok().build());
     }
+
+    @Operation(summary = "Get positions by multiple statuses", description = "Retrieves positions by multiple statuses")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Positions retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No positions found")
+    })
+    @GetMapping("/statuses")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin') or hasRole('ROLE_client-developer')")
+    public Mono<ResponseEntity<List<Position>>> getPositionsByStatuses(@RequestParam Status status1, @RequestParam Status status2) {
+        return Mono.just(ResponseEntity.ok(positionsService.getPositionsByStatuses(status1, status2)));
+    }
 }

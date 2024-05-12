@@ -17,4 +17,5 @@ public interface PositionsService {
     void fillPosition(String id, String hiredCandidateId);
     List<Position> getPositionsByStatus(Status status);
     List<Position> getPositionsByStatusAndSubStatus(@NonNull Status status, SubStatus subStatus);
+    List<Position> getPositionsByStatuses(Status status1, Status status2);
 }

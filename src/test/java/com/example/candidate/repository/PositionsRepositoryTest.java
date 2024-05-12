@@ -67,4 +67,11 @@ class PositionsRepositoryTest {
         List<Position> positions = positionsRepository.findPositionsByName("Developer");
         assertTrue(positions.contains(position1));
     }
+
+    @Test
+    void shouldReturnListOfPositionsByStatuses() {
+        List<Position> positions = positionsRepository.findPositionsByStatuses(Status.OPEN, Status.CLOSED);
+        assertTrue(positions.contains(position));
+        assertTrue(positions.contains(position1));
+    }
 }

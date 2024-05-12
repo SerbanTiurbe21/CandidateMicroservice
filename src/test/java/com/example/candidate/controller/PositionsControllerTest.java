@@ -132,4 +132,16 @@ class PositionsControllerTest {
         verify(positionsService).fillPosition("1", "2");
     }
 
+    @Test
+    void shouldGetPositionsByStatuses() {
+        when(positionsService.getPositionsByStatuses(Status.OPEN, Status.CLOSED)).thenReturn(List.of(position));
+
+        ResponseEntity<List<Position>> response = positionsController.getPositionsByStatuses(Status.OPEN, Status.CLOSED).block();
+
+        assert response != null;
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(List.of(position), response.getBody());
+        verify(positionsService).getPositionsByStatuses(Status.OPEN, Status.CLOSED);
+    }
+
 }

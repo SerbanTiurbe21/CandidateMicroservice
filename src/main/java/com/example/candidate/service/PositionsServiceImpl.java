@@ -98,6 +98,11 @@ public class PositionsServiceImpl implements PositionsService{
         return positionsRepository.findPositionsByStatusAndSubStatus(status, subStatus);
     }
 
+    @Override
+    public List<Position> getPositionsByStatuses(Status status1, Status status2) {
+        return positionsRepository.findPositionsByStatuses(status1, status2);
+    }
+
     private void ensurePositionIsOpen(Position position) {
         if (position.getStatus() == Status.CLOSED) {
             throw new PositionAlreadyDeactivatedException("This position is already closed.");
