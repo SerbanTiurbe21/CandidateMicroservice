@@ -123,7 +123,7 @@ public class PositionsController {
             @ApiResponse(responseCode = "404", description = "No positions found")
     })
     @GetMapping("/statuses")
-    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin') or hasRole('ROLE_client-developer')")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
     public Mono<ResponseEntity<List<Position>>> getPositionsByStatuses(@RequestParam Status status1, @RequestParam Status status2) {
         return Mono.just(ResponseEntity.ok(positionsService.getPositionsByStatuses(status1, status2)));
     }
