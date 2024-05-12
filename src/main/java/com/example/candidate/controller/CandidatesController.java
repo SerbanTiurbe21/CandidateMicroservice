@@ -140,4 +140,18 @@ public class CandidatesController {
         Candidate candidate = candidateService.findCandidateByDocumentId(documentId);
         return Mono.just(ResponseEntity.ok(candidate));
     }
+
+    @Operation(summary = "Hire a candidate", description = "Marks a candidate as hired")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Candidate hired successfully"),
+            @ApiResponse(responseCode = "404", description = "Candidate not found")
+    })
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
+    @PutMapping("/{id}/hire/{positionId}")
+    public Mono<ResponseEntity<Void>> hireCandidate(
+            @Parameter(description = "ID of the candidate to be hired") @PathVariable String id,
+            @Parameter(description = "ID of the position to which the candidate is hired") @PathVariable String positionId) {
+        candidateService.hireCandidate(id, positionId);
+        return Mono.just(ResponseEntity.noContent().build());
+    }
 }

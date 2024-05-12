@@ -20,8 +20,8 @@ class CandidateRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        candidate = new Candidate("1", "John Doe", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null, null);
-        candidate1 = new Candidate("2", "Jane Doe", "1234567890", "http://example.com/cv", "jane.doe@example.com", null, null, null, null);
+        candidate = new Candidate("1", "John Doe", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null, null, false);
+        candidate1 = new Candidate("2", "Jane Doe", "1234567890", "http://example.com/cv", "jane.doe@example.com", null, null, null, null, false);
         candidateRepository.saveAll(List.of(candidate, candidate1));
     }
 

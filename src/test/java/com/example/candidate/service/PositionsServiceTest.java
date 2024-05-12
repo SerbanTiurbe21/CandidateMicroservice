@@ -240,7 +240,7 @@ class PositionsServiceTest {
     void shouldFillPositionSuccessfully() {
         when(positionsRepository.findById("1")).thenReturn(Optional.of(position));
         when(candidateRepository.countCandidatesByPositionId("1")).thenReturn(0);
-        when(candidateRepository.findById(candidateId)).thenReturn(Optional.of(new Candidate(candidateId, "John Doe", "","","", null,null,null, null)));
+        when(candidateRepository.findById(candidateId)).thenReturn(Optional.of(new Candidate(candidateId, "John Doe", "","","", null,null,null, null, false)));
 
         positionsService.fillPosition("1", candidateId);
         assertEquals(Status.CLOSED, position.getStatus());

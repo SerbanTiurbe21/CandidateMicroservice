@@ -31,7 +31,7 @@ class CandidateControllerTest {
 
     @BeforeEach
     void setUp() {
-        candidate = new Candidate("1", "John Doe", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null, null);
+        candidate = new Candidate("1", "John Doe", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null, null, false);
     }
 
     @AfterEach
@@ -144,5 +144,16 @@ class CandidateControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(candidate, response.getBody());
         verify(candidateService).findCandidateByDocumentId("1");
+    }
+
+    @Test
+    void shouldHireCandidate() {
+        doNothing().when(candidateService).hireCandidate("1", "1");
+
+        ResponseEntity<Void> response = candidatesController.hireCandidate("1", "1").block();
+
+        assert response != null;
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(candidateService).hireCandidate("1", "1");
     }
 }

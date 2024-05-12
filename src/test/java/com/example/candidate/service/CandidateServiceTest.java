@@ -25,7 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CandidateServiceTest {
@@ -39,7 +40,7 @@ class CandidateServiceTest {
 
     @BeforeEach
     void setUp() {
-        candidate = new Candidate("1", "John Doe", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null, "1");
+        candidate = new Candidate("1", "John Doe", "1234567890", "http://example.com/cv", "john.doe@example.com", null, null, null, "1", false);
     }
 
     @AfterEach
@@ -202,5 +203,32 @@ class CandidateServiceTest {
         assertNotNull(foundCandidate);
 
         verify(candidateRepository).findCandidateByDocumentId(candidate.getDocumentId());
+    }
+
+    @Test
+    void shouldHireCandidate(){
+        Position position = Position.builder().id(candidate.getPositionId()).status(Status.OPEN).name("Software Engineer").build();
+        when(candidateRepository.findById(candidate.getId())).thenReturn(Optional.ofNullable(candidate));
+        when(positionsService.getPositionById(candidate.getPositionId())).thenReturn(position);
+        when(candidateRepository.save(candidate)).thenReturn(candidate);
+
+        candidateService.hireCandidate(candidate.getId(), candidate.getPositionId());
+
+        verify(candidateRepository).save(candidate);
+    }
+
+    @Test
+    void hireCandidateShouldThrowExceptionWhenCandidateNotFound(){
+        when(candidateRepository.findById(candidate.getId())).thenReturn(Optional.empty());
+
+        assertThrows(CandidateNotFoundException.class, () -> candidateService.hireCandidate(candidate.getId(), candidate.getPositionId()));
+    }
+
+    @Test
+    void hireCandidateShouldThrowExceptionWhenPositionNotFound(){
+        when(candidateRepository.findById(candidate.getId())).thenReturn(Optional.ofNullable(candidate));
+        when(positionsService.getPositionById(candidate.getPositionId())).thenThrow(PositionNotFoundException.class);
+
+        assertThrows(PositionNotFoundException.class, () -> candidateService.hireCandidate(candidate.getId(), candidate.getPositionId()));
     }
 }

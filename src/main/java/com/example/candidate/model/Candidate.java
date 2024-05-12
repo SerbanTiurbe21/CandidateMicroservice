@@ -32,4 +32,5 @@ public class Candidate {
     private String documentId;
     private String assignedTo;
     private String positionId;
+    private boolean isHired;
 }

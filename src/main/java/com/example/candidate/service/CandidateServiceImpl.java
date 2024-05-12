@@ -5,6 +5,8 @@ import com.example.candidate.exception.DuplicateCandidateException;
 import com.example.candidate.exception.PositionNotFoundException;
 import com.example.candidate.model.Candidate;
 import com.example.candidate.model.Position;
+import com.example.candidate.model.Status;
+import com.example.candidate.model.SubStatus;
 import com.example.candidate.repository.CandidateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -90,4 +92,20 @@ public class CandidateServiceImpl implements CandidateService {
     public Candidate findCandidateByDocumentId(String documentId) {
         return candidateRepository.findCandidateByDocumentId(documentId);
     }
+
+    @Override
+    public void hireCandidate(String candidateId, String positionId) {
+        Candidate candidate = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new CandidateNotFoundException("Candidate not exist with id: " + candidateId));
+        Position position = positionsService.getPositionById(positionId);
+
+        candidate.setHired(true);
+        position.setHiredCandidateId(candidateId);
+        position.setStatus(Status.CLOSED);
+        position.setSubStatus(SubStatus.FILLED);
+
+        candidateRepository.save(candidate);
+        positionsService.updatePosition(positionId, position);
+    }
+
 }
