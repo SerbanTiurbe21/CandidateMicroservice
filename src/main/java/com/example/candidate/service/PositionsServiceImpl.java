@@ -54,7 +54,13 @@ public class PositionsServiceImpl implements PositionsService{
         positionToUpdate.setName(position.getName());
         positionToUpdate.setStatus(position.getStatus());
         if(position.getStatus().equals(Status.CLOSED)){
+            if(position.getSubStatus() == null){
+                position.setSubStatus(null);
+            }
             positionToUpdate.setSubStatus(position.getSubStatus());
+        }
+        if(position.getStatus().equals(Status.OPEN) && position.getSubStatus() == null){
+            positionToUpdate.setSubStatus(null);
         }
         return positionsRepository.save(positionToUpdate);
     }

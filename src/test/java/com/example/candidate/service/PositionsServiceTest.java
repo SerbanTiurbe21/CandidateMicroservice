@@ -248,4 +248,28 @@ class PositionsServiceTest {
 
         verify(positionsRepository).findPositionsByStatuses(Status.OPEN, Status.CLOSED);
     }
+
+    @Test
+    void updatePositionWithStatusClosedAndNullSubStatus(){
+        Position updatedPosition = new Position("1", "Software Developer", Status.CLOSED, null, null);
+        when(positionsRepository.findById(position.getId())).thenReturn(Optional.of(position));
+        when(positionsRepository.save(position)).thenReturn(updatedPosition);
+
+        Position positionToUpdate = positionsService.updatePosition(position.getId(), updatedPosition);
+        assertNotNull(positionToUpdate);
+
+        verify(positionsRepository).save(position);
+    }
+
+    @Test
+    void updatePositionWithStatusOpenAndNullSubStatus(){
+        Position updatedPosition = new Position("1", "Software Developer", Status.OPEN, null, null);
+        when(positionsRepository.findById(position.getId())).thenReturn(Optional.of(position));
+        when(positionsRepository.save(position)).thenReturn(updatedPosition);
+
+        Position positionToUpdate = positionsService.updatePosition(position.getId(), updatedPosition);
+        assertNotNull(positionToUpdate);
+
+        verify(positionsRepository).save(position);
+    }
 }
