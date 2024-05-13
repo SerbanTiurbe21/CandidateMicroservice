@@ -1,6 +1,7 @@
 package com.example.candidate.service;
 
 import com.example.candidate.exception.*;
+import com.example.candidate.model.Candidate;
 import com.example.candidate.model.Position;
 import com.example.candidate.model.Status;
 import com.example.candidate.model.SubStatus;
@@ -77,12 +78,17 @@ public class PositionsServiceImpl implements PositionsService{
                 .orElseThrow(() -> new PositionNotFoundException("Position with id " + id + " not found"));
 
         ensurePositionIsOpen(position);
-        ensureCandidateExists(hiredCandidateId);
+        Candidate candidate = candidateRepository.findById(hiredCandidateId)
+                .orElseThrow(() -> new CandidateNotFoundException("Candidate with id " + hiredCandidateId + " not found"));
 
         position.setStatus(Status.CLOSED);
         position.setSubStatus(SubStatus.FILLED);
         position.setHiredCandidateId(hiredCandidateId);
         positionsRepository.save(position);
+
+        candidate.setHired(true);
+        candidate.setAssignedTo(null);
+        candidateRepository.save(candidate);
     }
 
     @Override
@@ -109,12 +115,6 @@ public class PositionsServiceImpl implements PositionsService{
     private void ensureNoActiveCandidates(String positionId) {
         if (candidateRepository.countCandidatesByPositionId(positionId) > 0) {
             throw new DeactivationNotAllowedException("Cannot modify position since there are active candidates linked to it.");
-        }
-    }
-
-    private void ensureCandidateExists(String candidateId) {
-        if (candidateRepository.findById(candidateId).isEmpty()) {
-            throw new CandidateNotFoundException("Candidate with id " + candidateId + " not found");
         }
     }
 }
