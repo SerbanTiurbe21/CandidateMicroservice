@@ -77,7 +77,6 @@ public class PositionsServiceImpl implements PositionsService{
                 .orElseThrow(() -> new PositionNotFoundException("Position with id " + id + " not found"));
 
         ensurePositionIsOpen(position);
-        ensureNoActiveCandidates(id);
         ensureCandidateExists(hiredCandidateId);
 
         position.setStatus(Status.CLOSED);

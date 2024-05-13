@@ -219,17 +219,8 @@ class PositionsServiceTest {
     }
 
     @Test
-    void fillPositionShouldThrowDeactivationNotAllowedExceptionForActiveCandidates() {
-        when(positionsRepository.findById("1")).thenReturn(Optional.of(position));
-        when(candidateRepository.countCandidatesByPositionId("1")).thenReturn(1);
-        assertThrows(DeactivationNotAllowedException.class,
-                () -> positionsService.fillPosition("1", candidateId));
-    }
-
-    @Test
     void fillPositionShouldThrowCandidateNotFoundException() {
         when(positionsRepository.findById("1")).thenReturn(Optional.of(position));
-        when(candidateRepository.countCandidatesByPositionId("1")).thenReturn(0);
         when(candidateRepository.findById(candidateId)).thenReturn(Optional.empty());
         assertThrows(CandidateNotFoundException.class,
                 () -> positionsService.fillPosition("1", candidateId));
@@ -238,7 +229,6 @@ class PositionsServiceTest {
     @Test
     void shouldFillPositionSuccessfully() {
         when(positionsRepository.findById("1")).thenReturn(Optional.of(position));
-        when(candidateRepository.countCandidatesByPositionId("1")).thenReturn(0);
         when(candidateRepository.findById(candidateId)).thenReturn(Optional.of(new Candidate(candidateId, "John Doe", "","","", null,null,null, null, false)));
 
         positionsService.fillPosition("1", candidateId);
