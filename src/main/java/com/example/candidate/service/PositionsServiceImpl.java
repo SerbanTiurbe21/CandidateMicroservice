@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class PositionsServiceImpl implements PositionsService{
@@ -110,6 +113,13 @@ public class PositionsServiceImpl implements PositionsService{
     @Override
     public List<Position> getPositionsByStatuses(Status status1, Status status2) {
         return positionsRepository.findPositionsByStatuses(status1, status2);
+    }
+
+    @Override
+    public Set<String> getUniquePositionNames() {
+        return positionsRepository.findAll().stream()
+                .map(Position::getName)
+                .collect(Collectors.toSet());
     }
 
     private void ensurePositionIsOpen(Position position) {

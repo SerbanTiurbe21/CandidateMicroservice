@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -144,4 +145,15 @@ class PositionsControllerTest {
         verify(positionsService).getPositionsByStatuses(Status.OPEN, Status.CLOSED);
     }
 
+    @Test
+    void shouldGetUniquePositionNames() {
+        when(positionsService.getUniquePositionNames()).thenReturn(Set.of("Project Manager"));
+
+        ResponseEntity<Set<String>> response = positionsController.getUniquePositionNames().block();
+
+        assert response != null;
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(Set.of("Project Manager"), response.getBody());
+        verify(positionsService).getUniquePositionNames();
+    }
 }

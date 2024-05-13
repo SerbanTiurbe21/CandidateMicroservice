@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -271,5 +272,16 @@ class PositionsServiceTest {
         assertNotNull(positionToUpdate);
 
         verify(positionsRepository).save(position);
+    }
+
+    @Test
+    void getUniquePositionNames(){
+        when(positionsRepository.findAll()).thenReturn(List.of(position));
+
+        Set<String> uniquePositionNames = positionsService.getUniquePositionNames();
+        assertFalse(uniquePositionNames.isEmpty());
+        assertNotNull(uniquePositionNames);
+
+        verify(positionsRepository).findAll();
     }
 }

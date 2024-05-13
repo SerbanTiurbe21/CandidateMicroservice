@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Set;
 
 @Tag(name = "Positions", description = "Operations related to positions")
 @RestController
@@ -126,5 +127,16 @@ public class PositionsController {
     @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin')")
     public Mono<ResponseEntity<List<Position>>> getPositionsByStatuses(@RequestParam Status status1, @RequestParam Status status2) {
         return Mono.just(ResponseEntity.ok(positionsService.getPositionsByStatuses(status1, status2)));
+    }
+
+    @Operation(summary = "Get unique positions by name", description = "Retrieves unique positions by name")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Positions retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No positions found")
+    })
+    @GetMapping("/unique")
+    @PreAuthorize("hasRole('ROLE_client-hr') or hasRole('ROLE_client-admin') or hasRole('ROLE_client-developer')")
+    public Mono<ResponseEntity<Set<String>>> getUniquePositionNames() {
+        return Mono.just(ResponseEntity.ok(positionsService.getUniquePositionNames()));
     }
 }

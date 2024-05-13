@@ -6,6 +6,7 @@ import com.example.candidate.model.SubStatus;
 import lombok.NonNull;
 
 import java.util.List;
+import java.util.Set;
 
 public interface PositionsService {
     List<Position> getAllPositions();
@@ -18,4 +19,5 @@ public interface PositionsService {
     List<Position> getPositionsByStatus(Status status);
     List<Position> getPositionsByStatusAndSubStatus(@NonNull Status status, SubStatus subStatus);
     List<Position> getPositionsByStatuses(Status status1, Status status2);
+    Set<String> getUniquePositionNames();
 }
