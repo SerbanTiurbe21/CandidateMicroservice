@@ -3,7 +3,7 @@
 Microserviciul de Candidați gestionează operațiunile legate de candidați în cadrul sistemului de microservicii. Acesta gestionează cererile HTTP pentru adăugarea, actualizarea, ștergerea și interogarea candidaților, implementând mecanisme de securitate prin JWT tokens.
 
 ## Descriere
-Microserviciul de Candidați este implementat folosind Spring Boot și Spring WebFlux, oferind un layer robust de gestionare a datelor candidaților. Acesta facilitează stocarea și interogarea datelor prin integrare cu MongoDB și include mecanisme avansate pentru gestionarea situațiilor de eroare și suprasolicitare.
+Microserviciul de Candidați este implementat folosind Spring Boot și Spring WebFlux, oferind un layer robust de gestionare a datelor candidaților. Acesta facilitează stocarea și interogarea datelor prin integrare cu MongoDB și include mecanisme pentru gestionarea situațiilor de eroare și suprasolicitare.
 
 ## Configurarea Proiectului
 
